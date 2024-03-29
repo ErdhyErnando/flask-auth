@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %} Flask Auth {% endblock%}
+
+
+{% block content %}
+    <h1>Flask Authentication </h1>
+
+    {% if current_user.is_authenticated %}
+        <h2>Welcome, {{ current_user.username }}!</h2>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    {% else %}
+        <h2>Hello!</h2>
+
+    {% endif %}
+
+    <a href="{{ url_for('login') }}">Login</a>
+    <a href="{{ url_for('signup') }}">Sign Up</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
+
+{% endblock %}

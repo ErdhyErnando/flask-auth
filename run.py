@@ -14,6 +14,9 @@ def run_flask_app():
         None
     """
     flask_app = create_app()
+    flask_app.run(host='0.0.0.0', debug=True)
 
-    if __name__ == '__main__':
-        flask_app.run(host='0.0.0.0', debug=True)
+
+if __name__ == '__main__':
+    run_flask_app()
+

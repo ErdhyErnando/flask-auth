@@ -103,6 +103,30 @@ def register_routes(app, db, bcrypt):
         return redirect(url_for('index'))
     
 
+    # version page
+    @app.route('/version1')
+    #@login_required
+    def version1():
+        """
+        Render the version1.html template.
+
+        Returns:
+            str: The rendered HTML content.
+        """
+        return render_template('version1.html')
+    
+    @app.route('/version2')
+    #@login_required
+    def version2():
+        """
+        Render the version2.html template.
+
+        Returns:
+            str: The rendered HTML content.
+        """
+        return render_template('version2.html')
+    
+
     # Custom Error Pages
 
     # Invalid URL

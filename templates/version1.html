@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %} version 1.0 {% endblock%}
+
+
+{% block content %}
+{% if current_user.is_authenticated %}
+
+<h1>Version 1</h1>
+
+{% else %}
+
+<h2>Access Denied</h2>
+<p>Please login to access this page</p>
+
+<a href="{{ url_for('login') }}" class="btn btn-dark">Login</a>
+
+
+
+{% endif %}
+
+
+{% endblock %}

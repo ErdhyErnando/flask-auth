@@ -1,5 +1,6 @@
 from flask import render_template, request, redirect, url_for
 from flask_login import login_user, logout_user, current_user, login_required
+from flask import flash
 from models import User
 
 def register_routes(app, db, bcrypt):
@@ -82,7 +83,10 @@ def register_routes(app, db, bcrypt):
                 login_user(user)
                 return render_template('index.html')
             else:
-                return 'Invalid credentials'
+                flash('Invalid Credentials', 'error')
+                
+        return render_template('login.html')
+                
     
     # Logout Route
     @app.route('/logout')
@@ -96,7 +100,7 @@ def register_routes(app, db, bcrypt):
             str: A message indicating successful logout.
         """
         logout_user()
-        return 'Logged out'
+        return redirect(url_for('index'))
     
 
     # Custom Error Pages

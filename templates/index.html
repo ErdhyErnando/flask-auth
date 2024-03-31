@@ -1,20 +1,63 @@
 {% extends 'base.html' %}
 {% block title %} Flask Auth {% endblock%}
 
-
 {% block content %}
-    <h1>Flask Authentication </h1>
+<div class="d-flex flex-column justify-content-center align-items-center" style="height: 20vh;">
+    <h1 class="mb-1">Flask Authentication </h1>
+</div>
 
-    {% if current_user.is_authenticated %}
-        <h2>Welcome, {{ current_user.username }}!</h2>
-        <a href="{{ url_for('logout') }}">Logout</a>
-    {% else %}
-        <h2>Hello!</h2>
+{% if current_user.is_authenticated %}
 
-    {% endif %}
+<div class="d-flex justify-content-center align-items-center">
+    <div class="card border rounded-5 bg-white shadow mx-auto" style="width: 100%; max-width: 600px;">
+        <div class="card-body text-center">
+            <h2 class="card-title">Welcome, {{ current_user.username }}!</h2>
 
-    <a href="{{ url_for('login') }}">Login</a>
-    <a href="{{ url_for('signup') }}">Sign Up</a>
-    <a href="{{ url_for('logout') }}">Logout</a>
+            <div class="row justify-content-center mt-3">
+                <div class="col-md-5 mb-3">
+                    <div class="card mx-auto" style="width: 100%;">
+                        <img src="/static/images/rpi2.jpg" class="card-img-top img-fluid" alt="..."
+                            style="height: 100px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">Version 1.0</h5>
+                            <p class="card-text">Some quick example text to build on the card title and make up the bulk
+                                of the card's content.</p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="card mx-auto" style="width: 100%;">
+                        <img src="/static/images/rpi3.jpg" class="card-img-top img-fluid" alt="..."
+                            style="height: 100px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">Version 2.0</h5>
+                            <p class="card-text">Some quick example text to build on the card title and make up the bulk
+                                of the card's content.</p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            <a href="{{ url_for('logout') }}" class="btn btn-dark mt-3">Logout</a>
+
+        </div>
+    </div>
+</div>
+
+{% else %}
+
+<div class="d-flex justify-content-center align-items-center" style="height: 45vh;">
+    <div class="card border rounded-5 bg-white shadow mx-auto d-flex align-items-center justify-content-center"
+        style="height: 40vh; width: 100%; max-width: 600px;">
+        <div class="card-body text-center">
+            <h5 class="card-title">Hello</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Please login to continue</h6>
+            <a href="{{ url_for('login') }}" class="btn btn-dark">Login</a>
+            <a href="{{ url_for('signup') }}" class="btn btn-dark">Sign Up</a>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

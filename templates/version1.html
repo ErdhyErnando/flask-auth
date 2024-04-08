@@ -4,8 +4,43 @@
 
 {% block content %}
 {% if current_user.is_authenticated %}
+<!DOCTYPE html>
+<html lang="en">
 
-<h1>Version 1</h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>=
+</head>
+
+<body>
+    <canvas id="lineChart" width="800" height="450"></canvas>
+    <script>
+        var ctx = document.getElementById("lineChart").getContext("2d");
+        var lineChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: {{ labels | safe }},
+        datasets: [{
+            label: "Data Points",
+            data: {{ values | safe}},
+            fill: false,
+            borderColor: "rgb(75, 192, 192)",
+            lineTension: 0.1
+                }
+        ]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+    </script>
+
+</body>
+
+</html>
+
 
 {% else %}
 

@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="d-flex flex-column justify-content-center align-items-center" style="height: 20vh;">
-    <h1 class="mb-1">Flask Authentication </h1>
+    <h1>Flask Authentication </h1>
 </div>
 
 {% if current_user.is_authenticated %}
@@ -40,8 +40,6 @@
                 </div>
             </div>
 
-            <a href="{{ url_for('logout') }}" class="btn btn-dark mt-3">Logout</a>
-
         </div>
     </div>
 </div>
@@ -49,15 +47,18 @@
 {% else %}
 
 <div class="d-flex justify-content-center align-items-center" style="height: 45vh;">
-    <div class="card border rounded-5 bg-white shadow mx-auto d-flex align-items-center justify-content-center"
-        style="height: 40vh; width: 100%; max-width: 600px;">
-        <div class="card-body text-center">
-            <h3 class="card-title">Hello</h3>
-            <h4 class="card-subtitle mb-2 text-muted">Please login to continue</h4>
-            <a href="{{ url_for('login') }}" class="btn btn-dark">Login</a>
-            <a href="{{ url_for('signup') }}" class="btn btn-dark">Sign Up</a>
+    <div class="card border rounded-5 bg-white shadow mx-auto" style="height: 40vh; width: 100%; max-width: 600px;">
+        <div class="card-body d-flex flex-column justify-content-center align-items-center">
+            <h3 class="card-title mb-4">Hello, Please login to continue</h3>
+            <div class="d-grid gap-2">
+                <button class="btn btn-dark" type="button"
+                    onclick="window.location.href='{{ url_for('login') }}'">Login</button>
+                <button class="btn btn-dark" type="button" onclick="window.location.href='{{ url_for('signup') }}'">Sign
+                    up</button>
+            </div>
         </div>
     </div>
 </div>
+
 {% endif %}
 {% endblock %}

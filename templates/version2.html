@@ -5,18 +5,88 @@
 {% block content %}
 {% if current_user.is_authenticated %}
 
-<h1>Version 2</h1>
+<!DOCTYPE html>
+<html lang="en">
 
-{% else %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>=
+</head>
 
-<h2>Access Denied</h2>
-<p>Please login to access this page</p>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col text-center mb-4">
+                <h1 class="display-5 fw-bold">Version 2.0</h1>
+            </div>
+        </div>
+    </div>
 
-<a href="{{ url_for('login') }}" class="btn btn-dark">Login</a>
+    <canvas id="lineChart" width="800" height="450"></canvas>
+    <script>
+        var ctx = document.getElementById("lineChart").getContext("2d");
+        var lineChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: {{ labels | safe }},
+        datasets: [{
+            label: "Data Points",
+            data: {{ values | safe}},
+            fill: false,
+            borderColor: "rgb(128, 0, 0)",
+            lineTension: 0.1
+                }
+        ]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+    </script>
+
+    <div class="container d-flex justify-content-center align-items-center mt-2">
+        <div class="row border rounded-5 p-3 bg-white shadow box-area">
+            <h3>Input Values</h3>
+            <form action="{{ url_for('version1') }}" method="POST">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control form-control-lg bg-light fs-6" name="input_value1"
+                        placeholder="Enter value 1" value="2">
+                </div>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control form-control-lg bg-light fs-6" name="input_value2"
+                        placeholder="Enter value 2" required>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control form-control-lg bg-light fs-6" name="input_value3"
+                        placeholder="Enter value 3" required>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control form-control-lg bg-light fs-6" name="input_value4"
+                        placeholder="Enter value 4" required>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control form-control-lg bg-light fs-6" name="input_value5"
+                        placeholder="Enter value 5" required>
+                </div>
+                <div class="input-group mb-5 d-flex justify-content-between">
+                    <button type="submit" class="btn btn-lg btn-dark w-100 fs-6">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% else %}
+
+    <h2>Access Denied</h2>
+    <p>Please login to access this page</p>
+
+    <a href="{{ url_for('login') }}" class="btn btn-dark">Login</a>
 
 
 
-{% endif %}
+    {% endif %}
 
 
-{% endblock %}
+    {% endblock %}

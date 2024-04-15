@@ -79,7 +79,9 @@ def register_routes(app, db, bcrypt):
 
             user = User.query.filter(User.username == username).first()
 
-            if bcrypt.check_password_hash(user.password, password):
+            if user is None:
+                flash('No account exists with that username', 'error')
+            elif bcrypt.check_password_hash(user.password, password):
                 login_user(user)
                 return render_template('index.html')
             else:
@@ -140,7 +142,23 @@ def register_routes(app, db, bcrypt):
         Returns:
             str: The rendered HTML content.
         """
-        return render_template('version2.html')
+        data = [
+            # create dummy data with date and value
+            ('2021-01-01', 100),
+            ('2021-01-02', 200),
+            ('2021-01-03', 300),
+            ('2021-01-04', 400),
+            ('2021-01-05', 500),
+            ('2021-01-06', 600),
+            ('2021-01-07', 700),
+            ('2021-01-08', 800),
+            ('2021-01-09', 900),
+            ('2021-01-10', 1000),
+        ]
+
+        labels = [row[0] for row in data]
+        values = [row[1] for row in data]
+        return render_template('version2.html', labels=labels, values=values)
     
 
     # Custom Error Pages

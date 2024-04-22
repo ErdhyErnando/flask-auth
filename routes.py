@@ -3,6 +3,14 @@ from flask_login import login_user, logout_user, current_user, login_required
 from flask import flash
 from models import User
 
+from flask import jsonify
+import random
+
+from data_generator import RandomDataGenerator
+
+generator = RandomDataGenerator()
+# generator.start()
+
 def register_routes(app, db, bcrypt):
     """
     Register routes for the Flask application.
@@ -190,5 +198,29 @@ def register_routes(app, db, bcrypt):
             tuple: A tuple containing the rendered HTML content and the HTTP status code.
         """
         return render_template('500.html'), 500
+    
 
+    # testing random data and routes
+    @app.route('/random-data')
+    def random_data():
+        data = generator.get_data()
+        if data:
+            return jsonify(data)
+        else:
+            return jsonify({"message": "No data generated yet."})
+
+    @app.route('/random-data-page')
+    def random_data_page():
+        return render_template('randomdata.html', generator=generator)
+    
+
+    @app.route('/start-data-generation')
+    def start_data_generation():
+        generator.start()
+        return jsonify({"message": "Data generation started."})
+    
+    @app.route('/stop-data-generation')
+    def stop_data_generation():
+        generator.stop()
+        return jsonify({"message": "Data generation stopped."})
 

@@ -213,6 +213,13 @@ def register_routes(app, db, bcrypt):
     def random_data_page():
         return render_template('randomdata.html', generator=generator)
     
+    @app.route('/scrollable-chart')
+    def scrollable_chart():
+        return render_template('scrollablechart.html')
+    
+    @app.route('/scrollable2')
+    def scrollable2():
+        return render_template('scrollable2.html', generator=generator)
 
     @app.route('/start-data-generation')
     def start_data_generation():

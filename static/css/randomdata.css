@@ -1,0 +1,20 @@
+.chart-container {
+    width: 100%;  
+    display: flex;
+    overflow-x: auto;  
+}
+
+.small-column {
+    width: 40px;
+}
+
+.large-column {
+    max-width: 100%;  
+    overflow-x: auto;  
+}
+
+.container {
+    width: calc(1000px - 40px);  
+    height: 500px;
+}
+

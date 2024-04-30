@@ -1,20 +1,49 @@
-.chart-container {
-    width: 100%;  
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.chartMenu {
+    width: 100vw;
+    height: 40px;
+    background: #1A1A1A;
+    color: white;
+}
+
+.chartMenu p {
+    padding: 10px;
+    font-size: 20px;
+}
+
+.chartCard {
+    width: 100%;
+    height: calc(100vh - 40px);
+    background: white;
     display: flex;
-    overflow-x: auto;  
+    align-items: center;
+    justify-content: center;
 }
 
-.small-column {
-    width: 40px;
+.chartBox {
+    width: 100%;
+    max-width: 700px;
+    padding: 20px;
+    border-radius: 20px;
+    border: solid 3px black;
+    background: white;
+    overflow: auto;
+    margin-top: 14px;
 }
 
-.large-column {
-    max-width: 100%;  
-    overflow-x: auto;  
+.containerBody {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
-.container {
-    width: calc(1000px - 40px);  
-    height: 500px;
+canvas {
+    max-width: 100%;
+    height: auto;
 }
-

@@ -84,10 +84,12 @@
 
 {% else %}
 
-<h2>Access Denied</h2>
-<p>Please login to access this page</p>
+<div class="d-flex flex-column justify-content-center align-items-center vh-100">
+    <h2>Access Denied</h2>
+    <p>Please login to access this page</p>
+    <a href="{{ url_for('login') }}" class="btn btn-dark">Login</a>
+</div>
 
-<a href="{{ url_for('login') }}" class="btn btn-dark">Login</a>
 
 
 

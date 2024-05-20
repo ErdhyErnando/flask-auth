@@ -8,6 +8,8 @@ import random
 
 from data_generator import RandomDataGenerator
 
+# from ClassTest import Test
+
 generator = RandomDataGenerator()
 # generator.start()
 
@@ -231,3 +233,9 @@ def register_routes(app, db, bcrypt):
         generator.stop()
         return jsonify({"message": "Data generation stopped."})
 
+    @app.route('/test-class')
+    def test_class():
+        test = Test(Var1)
+        result1 = test.out1[0]
+        result2 = test.out2[0]
+        return jsonify({"result1": result1, "result2": result2})

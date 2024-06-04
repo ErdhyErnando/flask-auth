@@ -2,77 +2,75 @@
 {% block title %} Flask Auth {% endblock%}
 
 {% block content %}
-<div class="d-flex flex-column justify-content-center align-items-center" style="height: 10vh;">
-    <h1>Flask Authentication</h1>
-
-</div>
 
 {% if current_user.is_authenticated %}
 
-<div class="d-flex justify-content-center align-items-center">
-    <div class="card border rounded-5 bg-white shadow mx-auto" style="width: 100%; max-width: 600px;">
-        <div class="card-body text-center">
-            <h2 class="card-title">Welcome, {{ current_user.username }}!</h2>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,
+    wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/hero.css">
+    <link rel="stylesheet" href="/static/css/upload.css">
+    <link rel="stylesheet" href="/static/css/utils.css">
+    <title>Rasp-WebApp UI</title>
+</head>
 
-            <div>
-                <a href="https://192.168.178.48:4200" target="_blank">Web SSH using shellinabox</a>
-            </div>
+<body>
+    <!--Main-->
+    <main class="hero">
+        <div class="hero__container">
 
-            <div class="row justify-content-center mt-3">
-                <div class="col-md-5 mb-3">
-                    <div class="card mx-auto" style="width: 100%;">
-                        <img src="/static/images/rpi2.jpg" class="card-img-top img-fluid" alt="..."
-                            style="height: 100px; object-fit: cover;">
-                        <div class="card-body">
-                            <h5 class="card-title">Orthosis Version 1.0</h5>
-                            <p class="card-text">Some quick example text to build on the card title and make up the bulk
-                                of the card's content.</p>
-                            <a href="{{ url_for('version1') }}" class="btn btn-success">Run Version 1.0</a>
-                        </div>
+            <a href="https://192.168.178.48:4200" target="_blank">
+                <div class="hero__clicontainer">
+                    <div class="cli__image">
+                        <img src="/static/images/cli_interface_3.jpg" alt="cli" class="cli mode pic">
                     </div>
+                    <h3>CLI Mode</h3>
+                    <p>lorem ipsum dolor sit amet</p>
+                    <p>Omnis magnam ad magni est</p>
                 </div>
-                <div class="col-md-5">
-                    <div class="card mx-auto" style="width: 100%;">
-                        <img src="/static/images/rpi3.jpg" class="card-img-top img-fluid" alt="..."
-                            style="height: 100px; object-fit: cover;">
-                        <div class="card-body">
-                            <h5 class="card-title">Orthosis Version 2.0</h5>
-                            <p class="card-text">Some quick example text to build on the card title and make up the bulk
-                                of the card's content.</p>
-                            <a href="{{ url_for('version2') }}" class="btn btn-success">Run Version 2.0</a>
-                        </div>
+            </a>
 
+            <!-- TODO: change lorem ipsum text-->
+            <a href="{{ url_for('gui') }}">
+                <div class="hero__guicontainer">
+                    <div class="gui__image">
+                        <img src="/static/images/gui_interface.jpg" alt="gui" class="gui mode pic">
                     </div>
+                    <h3>GUI Mode</h3>
+                    <p>lorem ipsum dolor sit amet</p>
+                    <p>Omnis magnam ad magni est</p>
                 </div>
-            </div>
-
+            </a>
         </div>
-    </div>
-</div>
+    </main>
 
+    <!--Upload-->
+    <section class="upload">
+        <div class="upload__container">
+            <a href="{{ url_for('uploadfile') }}" class="upload_button">Upload New File</a>
+        </div>
+    </section>
 
-<style>
-    .btn-success:hover {
-        background-color: #2d6a4f;
-        border-color: #2d6a4f;
+</body>
 
-    }
-</style>
+</html>
+
 
 {% else %}
 
-<div class="d-flex justify-content-center align-items-center" style="height: 45vh;">
-    <div class="card border rounded-5 bg-white shadow mx-auto" style="height: 40vh; width: 100%; max-width: 600px;">
-        <div class="card-body d-flex flex-column justify-content-center align-items-center">
-            <h2 class="card-title mb-3">Hello, Please login to continue</h2>
-            <div class="d-grid gap-2" style="width: 100%;">
-                <button class="btn btn-dark" type="button" style="width: 100%;"
-                    onclick="window.location.href='{{ url_for('login') }}'">Login</button>
-                <button class="btn btn-dark" type="button" style="width: 100%;"
-                    onclick="window.location.href='{{ url_for('signup') }}'">Sign
-                    up</button>
-            </div>
-        </div>
+<link rel="stylesheet" href="/static/css/hero.css">
+
+<div class="hero__login">
+    <h2 class="hero__logintitle">Hello, Please login to continue</h2>
+    <div class="d-grid gap-2">
+        <button class="hero__btn" type="button" onclick="window.location.href='{{ url_for('login') }}'">Login</button>
+        <button class="hero__btnsign" type="button"
+            onclick="window.location.href='{{ url_for('signup') }}'">Signup</button>
     </div>
 </div>
 

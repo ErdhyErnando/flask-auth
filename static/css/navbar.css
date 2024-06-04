@@ -1,0 +1,42 @@
+.header {
+  /* border: 1px solid rebeccapurple; */
+  display: flex;
+  background-color: #181818;
+}
+
+.nav__container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  margin: 10px;
+}
+
+.nav__container img {
+  width: 32px;
+}
+
+.nav__container ul {
+  display: flex;
+  list-style: none;
+  margin-left: 8px;
+  margin-top: 10px;
+}
+
+.nav__container ul li {
+  margin-right: 10px;
+}
+
+.nav__container ul li:nth-child(-n + 2) a {
+  text-decoration: none;
+  color: rgb(133, 133, 133);
+  font-size: 14px;
+}
+
+.nav__container ul li:not(:last-child) a:hover {
+  color: rgb(214, 214, 214);
+}
+
+.btn-logout {
+  background-color: red;
+}

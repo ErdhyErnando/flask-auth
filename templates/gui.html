@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %} GUI Mode {% endblock%}
+
+
+{% block content %}
+{% if current_user.is_authenticated %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,
+    wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/gui.css">
+    <link rel="stylesheet" href="/static/css/utils.css">
+    <title>GUI Mode</title>
+</head>
+
+<body>
+    <!-- Graph and Output-->
+    <section class="gui__graphoutput">
+
+        <!-- TODO: add real chart.js-->
+        <div class="gui__graph">
+            <img src="/public/graph.png" alt="graph" class="graph__image">
+        </div>
+
+        <!-- TODO: CHANGE TO DYNAMIC LATER-->
+        <div class="gui__output">
+            <p>test result 1: 9877.09</p>
+            <p>test result 2: 9873.09</p>
+            <p>test result 2: 8769.09</p>
+            <p>...</p>
+        </div>
+    </section>
+
+    <!-- Choose File and Parameter -->
+    <section class="gui__fileandparam">
+        <div class="gui__file">
+            <form action="">
+                <input type="file" accept=".py" id="UploadFile">
+                <label for="UploadFile" id="hiddenFileInput" class="gui__filelabel">Choose Files</label>
+            </form>
+        </div>
+
+        <div class="gui__param">
+            <input type="text" id="param1" name="param1" placeholder="Param 1">
+            <input type="text" id="param2" name="param2" placeholder="Param 2">
+            <input type="text" id="param3" name="param3" placeholder="Param 3">
+            <input type="text" id="param4" name="param4" placeholder="Param 4">
+            <input type="text" id="param5" name="param5" placeholder="Param 5">
+        </div>
+
+        <button class="gui__runbutton">Run</button>
+    </section>
+</body>
+
+<script>
+    document.querySelector('.gui__file').addEventListener('click', function () {
+        document.getElementById('hiddenFileInput').click();
+    });
+</script>
+
+</html>
+
+{% else %}
+
+<div class="d-flex flex-column justify-content-center align-items-center vh-100">
+    <h2>Access Denied</h2>
+    <p>Please login to access this page</p>
+    <a href="{{ url_for('login') }}" class="btn btn-dark">Login</a>
+</div>
+
+
+{% endif %}
+
+
+{% endblock %}

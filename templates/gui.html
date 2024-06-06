@@ -32,38 +32,66 @@
 
         <!-- TODO: CHANGE TO DYNAMIC LATER-->
         <div class="gui__output">
-            <p>test result 1: 9877.09</p>
+            <!-- <p>test result 1: 9877.09</p>
             <p>test result 2: 9873.09</p>
             <p>test result 2: 8769.09</p>
-            <p>...</p>
+            <p>...</p> -->
+            {% if output %}
+            <h3>Output:</h3>
+            <pre>{{ output }}</pre>
+            {% endif %}
         </div>
+
     </section>
 
     <!-- Choose File and Parameter -->
     <section class="gui__fileandparam">
-        <div class="gui__file">
-            <form action="">
-                <input type="file" accept=".py" id="UploadFile">
-                <label for="UploadFile" id="hiddenFileInput" class="gui__filelabel">Choose Files</label>
-            </form>
-        </div>
+        <form action="{{ url_for('gui') }}" method="post">
+            <div class="gui__file">
+                <label for="scriptSelect" id="hiddenFileInput" class="gui__filelabel">Choose Files</label>
+                <div class="gui__selectwrapper">
+                    <select name="script" id="scriptSelect">
+                        {% for script in scripts %}
+                        <option value="{{ script }}">{{ script }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
 
-        <div class="gui__param">
-            <input type="text" id="param1" name="param1" placeholder="Param 1">
-            <input type="text" id="param2" name="param2" placeholder="Param 2">
-            <input type="text" id="param3" name="param3" placeholder="Param 3">
-            <input type="text" id="param4" name="param4" placeholder="Param 4">
-            <input type="text" id="param5" name="param5" placeholder="Param 5">
-        </div>
+            <div class="gui__param">
+                <input type="text" id="param1" name="param1" placeholder="Param 1">
+                <input type="text" id="param2" name="param2" placeholder="Param 2">
+                <input type="text" id="param3" name="param3" placeholder="Param 3">
+                <input type="text" id="param4" name="param4" placeholder="Param 4">
+                <input type="text" id="param5" name="param5" placeholder="Param 5">
+            </div>
 
-        <button class="gui__runbutton">Run</button>
+            <div class="gui__btnwrapper">
+                <button type="submit" class="gui__runbutton">Run</button>
+            </div>
+
+        </form>
     </section>
 </body>
 
 <script>
+    // Dropdown Selection
     document.querySelector('.gui__file').addEventListener('click', function () {
-        document.getElementById('hiddenFileInput').click();
+        document.getElementById('scriptSelect').click();
     });
+
+    // Update label text with selected option
+    document.addEventListener('DOMContentLoaded', function () {
+        var selectElement = document.getElementById('scriptSelect');
+        var labelElement = document.getElementById('hiddenFileInput');
+
+        selectElement.addEventListener('change', function () {
+            var selectedText = selectElement.options[selectElement.selectedIndex].text;
+            // Update label text with selected option
+            labelElement.textContent = selectedText;
+        });
+    });
+
 </script>
 
 </html>

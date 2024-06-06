@@ -5,6 +5,12 @@ from models import User
 
 from flask import jsonify
 
+import os
+import subprocess
+
+# TODO: Change this to the path on Raspberry Pi
+SCRIPTS_DIR = 'C:\\Users\\Erdhy Ernando\\Desktop\\Dev\\flask-auth\\orthosis-scripts'
+
 def register_routes(app, db, bcrypt):
 
     # Index Route
@@ -59,19 +65,6 @@ def register_routes(app, db, bcrypt):
         logout_user()
         return redirect(url_for('index'))
     
-    # ========= Pages ============
-    
-    # GUI Page
-    @app.route('/gui', methods=['GET', 'POST'])
-    def gui():
-        return render_template('gui.html')
-    
-    #Upload New File
-    @app.route('/uploadfile', methods=['GET', 'POST'])
-    def uploadfile(): 
-        return render_template('uploadfile.html')
-    
-
     # ========= Custom Error Pages ============
 
     # Invalid URL
@@ -83,4 +76,31 @@ def register_routes(app, db, bcrypt):
     @app.errorhandler(500)
     def internal_server_error(e):
         return render_template('500.html'), 500
+    
+    # ========= Pages ============
+    
+    # GUI Page
+    @app.route('/gui', methods=['GET', 'POST'])
+    def gui():
+        output = None  # Initialize output variable
+        if request.method == 'POST':
+            selected_script = request.form.get('script')  
+            script_path = os.path.join(SCRIPTS_DIR, selected_script)
+            if os.path.exists(script_path):
+                result = subprocess.run(['python', script_path], capture_output=True)
+                output = result.stdout.decode('utf-8')  
+            else:
+                output = 'Script not found'
+        return render_template('gui.html', scripts=get_scripts(), output=output)  
+    
+
+    #Upload New File
+    @app.route('/uploadfile', methods=['GET', 'POST'])
+    def uploadfile(): 
+        return render_template('uploadfile.html')
+    
+# ========= Helper Functions ============
+def get_scripts():
+    return [f for f in os.listdir(SCRIPTS_DIR) if f.endswith('.py')]
+
     

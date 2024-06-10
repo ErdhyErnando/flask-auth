@@ -4,51 +4,25 @@ from flask import flash
 from models import User
 
 from flask import jsonify
-import random
 
-from data_generator import RandomDataGenerator
+import os
+import subprocess
 
-generator = RandomDataGenerator()
-# generator.start()
+# TODO: Change this to the path on Raspberry Pi
+SCRIPTS_DIR = 'C:\\Users\\Erdhy Ernando\\Desktop\\Dev\\flask-auth\\orthosis-scripts'
 
 def register_routes(app, db, bcrypt):
-    """
-    Register routes for the Flask application.
-
-    Args:
-        app (Flask): The Flask application instance.
-        db (SQLAlchemy): The SQLAlchemy database instance.
-        bcrypt (Bcrypt): The Bcrypt instance for password hashing.
-
-    Returns:
-        None
-    """
 
     # Index Route
     @app.route('/')
     def index():
-        """
-        Render the index.html template.
-
-        Returns:
-            str: The rendered HTML content.
-        """
         return render_template('index.html')
 
+    # ========= Authentication Route ============
 
     # Signup Route
     @app.route('/signup', methods=['GET', 'POST'])
     def signup():
-        """
-        Handle the signup form submission.
-
-        If the request method is GET, render the signup.html template.
-        If the request method is POST, retrieve the username and password from the form,
-        hash the password using Bcrypt, create a new user in the database, and redirect to the index page.
-
-        Returns:
-            str: The rendered HTML content or a redirect response.
-        """
         if request.method == 'GET':
             return render_template('signup.html')
         elif request.method == 'POST':
@@ -67,18 +41,6 @@ def register_routes(app, db, bcrypt):
     # Login Route
     @app.route('/login', methods=['GET', 'POST'])
     def login():
-        """
-        Handle the login form submission.
-
-        If the request method is GET, render the login.html template.
-        If the request method is POST, retrieve the username and password from the form,
-        retrieve the user from the database based on the username,
-        check if the password matches the hashed password in the database,
-        and either log in the user or display an error message.
-
-        Returns:
-            str: The rendered HTML content or an error message.
-        """
         if request.method == 'GET':
             return render_template('login.html')
         elif request.method == 'POST':
@@ -97,137 +59,62 @@ def register_routes(app, db, bcrypt):
                 
         return render_template('login.html')
                 
-    
-    # Logout Route
+    #Logout Route
     @app.route('/logout')
     def logout():
-        """
-        Handle the logout request.
-
-        Log out the currently logged-in user.
-
-        Returns:
-            str: A message indicating successful logout.
-        """
         logout_user()
         return redirect(url_for('index'))
     
-
-    # version page
-    @app.route('/version1')
-    #@login_required
-    def version1():
-        """
-        Render the version1.html template.
-
-        Returns:
-            str: The rendered HTML content.
-        """
-        data = [
-            # create dummy data with date and value
-            ('2021-01-01', 100),
-            ('2021-01-02', 200),
-            ('2021-01-03', 300),
-            ('2021-01-04', 400),
-            ('2021-01-05', 500),
-            ('2021-01-06', 600),
-            ('2021-01-07', 700),
-            ('2021-01-08', 800),
-            ('2021-01-09', 900),
-            ('2021-01-10', 1000),
-        ]
-
-        labels = [row[0] for row in data]
-        values = [row[1] for row in data]
-        return render_template('version1.html', labels=labels, values=values)
-    
-    @app.route('/version2')
-    #@login_required
-    def version2():
-        """
-        Render the version2.html template.
-
-        Returns:
-            str: The rendered HTML content.
-        """
-        data = [
-            # create dummy data with date and value
-            ('2021-01-01', 100),
-            ('2021-01-02', 200),
-            ('2021-01-03', 300),
-            ('2021-01-04', 400),
-            ('2021-01-05', 500),
-            ('2021-01-06', 600),
-            ('2021-01-07', 700),
-            ('2021-01-08', 800),
-            ('2021-01-09', 900),
-            ('2021-01-10', 1000),
-        ]
-
-        labels = [row[0] for row in data]
-        values = [row[1] for row in data]
-        return render_template('version2.html', labels=labels, values=values)
-    
-
-    # Custom Error Pages
+    # ========= Custom Error Pages ============
 
     # Invalid URL
     @app.errorhandler(404)
     def page_not_found(e):
-        """
-        Render the 404.html template for invalid URLs.
-
-        Args:
-            e (Exception): The exception object.
-
-        Returns:
-            tuple: A tuple containing the rendered HTML content and the HTTP status code.
-        """
         return render_template('404.html'), 404
     
     # Internal Server Error
     @app.errorhandler(500)
     def internal_server_error(e):
-        """
-        Render the 500.html template for internal server errors.
-
-        Args:
-            e (Exception): The exception object.
-
-        Returns:
-            tuple: A tuple containing the rendered HTML content and the HTTP status code.
-        """
         return render_template('500.html'), 500
     
-
-    # testing random data and routes
-    @app.route('/random-data')
-    def random_data():
-        data = generator.get_data()
-        if data:
-            return jsonify(data)
-        else:
-            return jsonify({"message": "No data generated yet."})
-
-    @app.route('/random-data-page')
-    def random_data_page():
-        return render_template('randomdata.html', generator=generator)
+    # ========= Pages ============
     
-    @app.route('/scrollable-chart')
-    def scrollable_chart():
-        return render_template('scrollablechart.html')
+    # GUI Page
+    @app.route('/gui', methods=['GET', 'POST'])
+    def gui():
+        output = None  # Initialize output variable
+        if request.method == 'POST':
+            selected_script = request.form.get('script')  
+            script_path = os.path.join(SCRIPTS_DIR, selected_script)
+            if os.path.exists(script_path):
+                result = subprocess.run(['python', script_path], capture_output=True)
+                output = result.stdout.decode('utf-8')  
+            else:
+                output = 'Script not found'
+        return render_template('gui.html', scripts=get_scripts(), output=output)  
     
-    @app.route('/scrollable2')
-    def scrollable2():
-        return render_template('scrollable2.html', generator=generator)
 
-    @app.route('/start-data-generation')
-    def start_data_generation():
-        generator.start()
-        return jsonify({"message": "Data generation started."})
+    #Upload New File
+    @app.route('/uploadfile', methods=['GET', 'POST'])
+    def uploadfile(): 
+        if request.method == 'POST':
+            file = request.files['file']
+            if file and file.filename.endswith('.py'):
+                file_path = os.path.join(SCRIPTS_DIR, file.filename)
+                file.save(file_path)
+                flash('File uploaded successfully', 'success')
+            else:
+                flash('please select a valid python file', 'error')
+        
+        return render_template('uploadfile.html')
     
-    @app.route('/stop-data-generation')
-    def stop_data_generation():
-        generator.stop()
-        return jsonify({"message": "Data generation stopped."})
-
+# ========= Helper Functions ============
+def get_scripts():
+    scripts = []
+    for root, dirs, files in os.walk(SCRIPTS_DIR):
+        for filename in files:
+            if filename.endswith('.py'):
+                # Prepend directory path to filename (optional)
+                script_path = os.path.join(root, filename)
+                scripts.append(script_path)  # Or scripts.append(filename)
+    return scripts

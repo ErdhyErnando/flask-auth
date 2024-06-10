@@ -1,0 +1,151 @@
+/*1. Graph and Output*/
+body {
+  font-family: "DM Mono", monospace;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f8f8;
+}
+
+.gui__graphoutput {
+  /* border: 2px solid red; */
+  display: flex;
+  flex-direction: column;
+  margin: 25px 20px;
+  padding: 10px 10px;
+  border-radius: 10px;
+  background-color: #f8f8f8;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
+  gap: 12.5px;
+}
+
+.gui__graph {
+  border: 1.5px solid rgb(0, 0, 0);
+  border-radius: 10px 10px 0px 0px;
+  width: 100%;
+  height: 100%;
+  padding: 7px;
+}
+
+.gui__output {
+  border: 1.5px solid rgb(0, 0, 0);
+  border-radius: 0px 0px 10px 10px;
+  background-color: #d9d9d9;
+  width: 100%;
+  height: 100%;
+  padding: 7px;
+}
+
+/*2. Choose file and input parameters*/
+
+.gui__fileandparam {
+  /* border: 2px solid red; */
+  display: flex;
+  flex-direction: column;
+  margin: 25px 20px;
+  padding: 10px 10px;
+  border-radius: 10px;
+  background-color: #f8f8f8;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
+  gap: 12.5px;
+}
+
+.gui__fileandparam {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* align-items: center; */
+}
+
+input[type="file"] {
+  display: none;
+}
+
+label {
+  display: inline-block;
+  padding: 15px 25px;
+}
+
+.gui__file {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1.5px solid rgb(0, 0, 0);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
+  border-radius: 44px;
+  width: 95%;
+  padding: 2px;
+  margin: 8px auto; /* Add 'auto' to horizontally center the element */
+  background-color: #d9d9d9;
+}
+
+.gui__selectwrapper {
+  /* border: 2px solid red; */
+  position: relative;
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+  background: url("/static/images/dropdown-symbol.png") no-repeat center;
+  background-size: cover;
+  margin-right: 16px;
+}
+
+.gui__selectwrapper:hover {
+  cursor: pointer;
+  background-color: rgb(116, 116, 109);
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.gui__selectwrapper select {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+}
+
+form {
+  cursor: pointer;
+}
+
+.gui__param {
+  margin: auto 25px;
+}
+
+input {
+  border-radius: 10px;
+  width: 100%;
+  padding: 10px 10px;
+  margin: 5px 0px;
+}
+
+input::placeholder {
+  font-family: "DM Mono", monospace;
+}
+
+.gui__btnwrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gui__runbutton {
+  border-radius: 10px;
+  font-family: DM Mono, monospace;
+  width: 25%;
+  padding: 8px 10px;
+  margin: 5px 0px;
+  background-color: #33ff6c;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.gui__runbutton:hover {
+  background-color: #31df62;
+  color: #000000;
+  border: 2px solid #f8f8f8;
+}

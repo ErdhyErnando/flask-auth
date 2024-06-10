@@ -97,10 +97,24 @@ def register_routes(app, db, bcrypt):
     #Upload New File
     @app.route('/uploadfile', methods=['GET', 'POST'])
     def uploadfile(): 
+        if request.method == 'POST':
+            file = request.files['file']
+            if file and file.filename.endswith('.py'):
+                file_path = os.path.join(SCRIPTS_DIR, file.filename)
+                file.save(file_path)
+                flash('File uploaded successfully', 'success')
+            else:
+                flash('please select a valid python file', 'error')
+        
         return render_template('uploadfile.html')
     
 # ========= Helper Functions ============
 def get_scripts():
-    return [f for f in os.listdir(SCRIPTS_DIR) if f.endswith('.py')]
-
-    
+    scripts = []
+    for root, dirs, files in os.walk(SCRIPTS_DIR):
+        for filename in files:
+            if filename.endswith('.py'):
+                # Prepend directory path to filename (optional)
+                script_path = os.path.join(root, filename)
+                scripts.append(script_path)  # Or scripts.append(filename)
+    return scripts

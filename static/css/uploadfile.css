@@ -38,21 +38,15 @@
   gap: 5px;
 }
 
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  border: 2px dashed #05050e;
-  border-radius: 10px;
-}
-
 .uploadfile__uploadtext {
-  /* border: 1px solid red; */
+  border: 1px solid red;
   display: flex;
   flex-direction: column;
   place-items: center;
   padding: 100px 0;
   cursor: pointer;
+  border: 2px dashed #05050e;
+  border-radius: 10px;
 }
 
 .uploadfile__uploadtext p {

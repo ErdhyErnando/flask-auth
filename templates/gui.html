@@ -84,11 +84,12 @@
     document.addEventListener('DOMContentLoaded', function () {
         var selectElement = document.getElementById('scriptSelect');
         var labelElement = document.getElementById('hiddenFileInput');
-
         selectElement.addEventListener('change', function () {
             var selectedText = selectElement.options[selectElement.selectedIndex].text;
-            // Update label text with selected option
-            labelElement.textContent = selectedText;
+            // Extract filename from the full path
+            var filename = selectedText.split('\\').pop();
+            // Update label text with selected filename
+            labelElement.textContent = filename; n
         });
     });
 

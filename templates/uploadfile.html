@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %} Upload New File {% endblock%}
+{% block title %} Upload New File {% endblock %}
 
 
 {% block content %}
@@ -29,31 +29,67 @@
             <h2>Add New File</h2>
         </div>
 
-        <div class="uploadfile__title">
-            <label for="text">Title</label>
-            <input type="text" id="title" name="title">
-        </div>
+        <form action="{{ url_for('uploadfile') }}" method="post" enctype="multipart/form-data">
+            <div class="uploadfile__title">
+                <label for="text">Title</label>
+                <input type="text" id="title" name="title">
+            </div>
 
-        <div class="uploadfile__upload">
-            <label for="text">Attach File</label>
-            <form action="">
+            <div class="uploadfile__upload">
+                <label for="text">Attach File</label>
+
+                <!--input the file-->
                 <div class="uploadfile__uploadtext">
                     <input type="file" id="hiddenFileInput" name="file" class="uploadfile__fileinput">
                     <p>click here to select a file</p>
                 </div>
-            </form>
-        </div>
+            </div>
 
-        <div class="uploadfile__btncontainer">
-            <button class="uploadfile__button">Upload</button>
-        </div>
+            <div class="uploadfile__progress">
+                <progress id="fileUploadProgress" value="0" max="100"></progress>
+            </div>
 
+            <div class="uploadfile__btncontainer">
+                <button type="submit" class="uploadfile__button">Upload</button>
+            </div>
+        </form>
     </main>
 </body>
 
 <script>
     document.querySelector('.uploadfile__uploadtext').addEventListener('click', function () {
         document.getElementById('hiddenFileInput').click();
+    });
+
+    document.querySelector('form').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        var title = document.getElementById('title').value;
+        var fileInput = document.getElementById('hiddenFileInput');
+        var file = fileInput.files[0];
+        var formData = new FormData();
+        formData.append('title', title);
+        formData.append('file', file);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '{{ url_for('uploadfile') }}', true);
+
+        xhr.upload.onprogress = function (event) {
+            if (event.lengthComputable) {
+                var percentComplete = (event.loaded / event.total) * 100;
+                document.getElementById('fileUploadProgress').value = percentComplete;
+            }
+        };
+
+        xhr.onload = function () {
+            if (xhr.status == 200) {
+                alert('File uploaded successfully');
+            } else {
+                alert('File upload failed');
+            }
+        };
+
+        xhr.send(formData);
     });
 </script>
 

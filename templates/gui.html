@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block title %} GUI Mode {% endblock%}
 
-
 {% block content %}
 {% if current_user.is_authenticated %}
 
@@ -14,10 +13,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,
-    wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
+    wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/styles.css">
     <link rel="stylesheet" href="/static/css/gui.css">
     <link rel="stylesheet" href="/static/css/utils.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
     <title>GUI Mode</title>
 </head>
 
@@ -32,67 +32,75 @@
 
         <!-- TODO: CHANGE TO DYNAMIC LATER-->
         <div class="gui__output">
-            <!-- <p>test result 1: 9877.09</p>
-            <p>test result 2: 9873.09</p>
-            <p>test result 2: 8769.09</p>
-            <p>...</p> -->
-            {% if output %}
-            <h3>Output:</h3>
-            <pre>{{ output }}</pre>
-            {% endif %}
+            <pre id="output"></pre>
         </div>
 
     </section>
 
     <!-- Choose File and Parameter -->
     <section class="gui__fileandparam">
-        <form action="{{ url_for('gui') }}" method="post">
-            <div class="gui__file">
-                <label for="scriptSelect" id="hiddenFileInput" class="gui__filelabel">Choose Files</label>
-                <div class="gui__selectwrapper">
-                    <select name="script" id="scriptSelect">
-                        {% for script in scripts %}
-                        <option value="{{ script }}">{{ script }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+        <div class="gui__file">
+            <label for="scriptSelect" id="hiddenFileInput" class="gui__filelabel">Choose Files</label>
+            <div class="gui__selectwrapper">
+                <select name="script" id="scriptSelector">
+                    {% for script in scripts %}
+                    <option value="{{ script }}">{{ script }}</option>
+                    {% endfor %}
+                </select>
             </div>
+        </div>
 
-            <div class="gui__param">
-                <input type="text" id="param1" name="param1" placeholder="Param 1">
-                <input type="text" id="param2" name="param2" placeholder="Param 2">
-                <input type="text" id="param3" name="param3" placeholder="Param 3">
-                <input type="text" id="param4" name="param4" placeholder="Param 4">
-                <input type="text" id="param5" name="param5" placeholder="Param 5">
-            </div>
+        <div class="gui__param">
+            <input type="text" id="param1" name="param1" placeholder="Param 1">
+            <input type="text" id="param2" name="param2" placeholder="Param 2">
+            <input type="text" id="param3" name="param3" placeholder="Param 3">
+            <input type="text" id="param4" name="param4" placeholder="Param 4">
+            <input type="text" id="param5" name="param5" placeholder="Param 5">
+        </div>
 
-            <div class="gui__btnwrapper">
-                <button type="submit" class="gui__runbutton">Run</button>
-            </div>
-
-        </form>
+        <div class="gui__btnwrapper">
+            <button id="startButton" class="gui__runbutton">Run</button>
+            <button id="stopButton" class="gui__stopbutton">Stop</button>
+        </div>
     </section>
 </body>
 
 <script>
-    // Dropdown Selection
     document.querySelector('.gui__file').addEventListener('click', function () {
-        document.getElementById('scriptSelect').click();
+        document.getElementById('scriptSelector').click();
     });
 
-    // Update label text with selected option
     document.addEventListener('DOMContentLoaded', function () {
-        var selectElement = document.getElementById('scriptSelect');
+        var selectElement = document.getElementById('scriptSelector');
         var labelElement = document.getElementById('hiddenFileInput');
         selectElement.addEventListener('change', function () {
             var selectedText = selectElement.options[selectElement.selectedIndex].text;
-            // Extract filename from the full path
             var filename = selectedText.split('\\').pop();
-            // Update label text with selected filename
-            labelElement.textContent = filename; n
+            labelElement.textContent = filename;
         });
     });
 
+    document.addEventListener('DOMContentLoaded', function () {
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        document.getElementById('startButton').addEventListener('click', function (event) {
+            event.preventDefault();
+            var selectedFile = document.getElementById('scriptSelector').value;
+            document.getElementById('output').textContent = ''; // Clear output area
+            socket.emit('start_script', { filename: selectedFile });
+        });
+
+        document.getElementById('stopButton').addEventListener('click', function (event) {
+            event.preventDefault();
+            socket.emit('stop_script');
+        });
+
+        socket.on('script_output', function (data) {
+            var outputElement = document.getElementById('output');
+            outputElement.textContent += data.output; // Append new output
+            outputElement.scrollTop = outputElement.scrollHeight; // Auto scroll to the bottom
+        });
+    });
 </script>
 
 </html>
@@ -105,8 +113,6 @@
     <a href="{{ url_for('login') }}" class="btn btn-dark">Login</a>
 </div>
 
-
 {% endif %}
-
 
 {% endblock %}

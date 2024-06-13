@@ -35,6 +35,13 @@ body {
   padding: 7px;
 }
 
+/* Add this CSS for scrollable output */
+#output {
+  max-height: 140px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+
 /*2. Choose file and input parameters*/
 
 .gui__fileandparam {
@@ -146,6 +153,25 @@ input::placeholder {
 
 .gui__runbutton:hover {
   background-color: #31df62;
+  color: #000000;
+  border: 2px solid #f8f8f8;
+}
+
+.gui__stopbutton {
+  border-radius: 10px;
+  font-family: DM Mono, monospace;
+  width: 25%;
+  padding: 8px 10px;
+  margin: 5px 0px;
+  background-color: #ff3333;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.gui__stopbutton:hover {
+  background-color: #df3131;
   color: #000000;
   border: 2px solid #f8f8f8;
 }

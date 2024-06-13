@@ -99,7 +99,7 @@ label {
 .gui__selectwrapper:hover {
   cursor: pointer;
   background-color: rgb(116, 116, 109);
-  padding: 8px;
+  padding: 10px;
   border-radius: 4px;
 }
 
@@ -136,6 +136,7 @@ input::placeholder {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 10px;
 }
 
 .gui__runbutton {

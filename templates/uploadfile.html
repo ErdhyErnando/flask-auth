@@ -72,7 +72,7 @@
         formData.append('file', file);
 
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', '{{ url_for('uploadfile') }}', true);
+        xhr.open('POST', '{{ url_for("uploadfile") }}', true);
 
         xhr.upload.onprogress = function (event) {
             if (event.lengthComputable) {

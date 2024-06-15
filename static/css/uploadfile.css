@@ -59,6 +59,27 @@
   color: #3e42ce;
 }
 
+.uploadfile__progress {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  background-color: rgba(143, 143, 143, 0.3);
+  border-radius: 10px;
+}
+
+#feedback {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #f8f8f8;
+  color: #4c53ff;
+}
+
 .uploadfile__fileinput {
   display: none;
 }

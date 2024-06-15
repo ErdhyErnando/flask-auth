@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 from models import User
 from flask_socketio import emit
@@ -113,17 +113,29 @@ def register_routes(app, db, bcrypt, socketio):
                 socketio.emit('script_output', {'output': 'Script not found'}, namespace='/')
         return render_template('gui.html', scripts=get_scripts())  
     
+    
     @app.route('/uploadfile', methods=['GET', 'POST'])
     def uploadfile(): 
         if request.method == 'POST':
             file = request.files['file']
             if file and file.filename.endswith('.py'):
-                file_path = os.path.join(SCRIPTS_DIR, file.filename)
+                # Ensure the folder exists
+                folder_path = SCRIPTS_DIR
+                if not os.path.exists(folder_path):
+                    os.makedirs(folder_path)
+                file_path = os.path.join(folder_path, file.filename)
+                
+                # Save the file
                 file.save(file_path)
+                
+                # Log for debugging
+                print(f"File saved to: {file_path}")
+                
                 flash('File uploaded successfully', 'success')
             else:
-                flash('please select a valid python file', 'error')
+                flash('Please select a valid python file', 'error')
         return render_template('uploadfile.html')
+        
     
 def get_scripts():
     scripts = []

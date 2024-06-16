@@ -5,42 +5,71 @@ from flask_socketio import emit
 import os
 import subprocess
 import threading
-
+import zmq
+import time
 import select
 
 # SCRIPTS_DIR = 'C:\\Users\\Erdhy Ernando\\Desktop\\Dev\\flask-auth\\orthosis-scripts'
-RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'
+RASP_DIR = '/home/mhstrake28/flask-auth/orthosis-scripts'
 
 def register_routes(app, db, bcrypt, socketio):
     global running_thread, stop_thread
     running_thread = None
     stop_thread = False
-
     def run_script_continuous(script_name):
         global stop_thread
         stop_thread = False
 
         try:
-            process = subprocess.Popen(['python3', script_name],
-                                        stdout=subprocess.PIPE,
-                                        stderr=subprocess.PIPE,
-                                        text=True,
-                                        bufsize=1)
+            port = "5001"
+            # Creates a socket instance
+            context = zmq.Context()
+            socket = context.socket(zmq.SUB)
+            # Connects to a bound socket
+            socket.connect(f"tcp://localhost:{port}")
+            # Subscribes to all topics
+            socket.subscribe("")
+            process = subprocess.Popen(['python3', script_name])
             while True:
                 if stop_thread:
                     process.terminate()
                     break
 
-                ready_to_read, _, _ = select.select([process.stdout], [], [], 0.1)
-                if ready_to_read:
-                    output = process.stdout.readline()
-                    if output:
-                        socketio.emit('script_output', {'output': output}, namespace='/')
-                    elif process.poll() is not None:
-                        break
+                output = socket.recv_string()
+                if output != "test-0:0:0:0":
+                    socketio.emit('script_output', {'output': output}, namespace='/')
+                else:
+                    break
+                time.sleep(0.1)
 
-            process.stdout.close()
-            process.stderr.close()
+        except Exception as e:
+            socketio.emit('script_output', {'output': str(e)}, namespace='/')
+    def run_script_continuous(script_name):
+        global stop_thread
+        stop_thread = False
+
+        try:
+            port = "5001"
+            # Creates a socket instance
+            context = zmq.Context()
+            socket = context.socket(zmq.SUB)
+            # Connects to a bound socket
+            socket.connect(f"tcp://localhost:{port}")
+            # Subscribes to all topics
+            socket.subscribe("")
+            process = subprocess.Popen(['python3', script_name])
+            while True:
+                if stop_thread:
+                    process.terminate()
+                    break
+
+                output = socket.recv_string()
+                if output != "test-0:0:0:0":
+                    output_with_breaks = output + '\n'
+                    socketio.emit('script_output', {'output': output_with_breaks}, namespace='/')
+                else:
+                    break
+                time.sleep(0.1)
 
         except Exception as e:
             socketio.emit('script_output', {'output': str(e)}, namespace='/')

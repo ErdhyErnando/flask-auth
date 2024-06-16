@@ -39,6 +39,7 @@ body {
 #output {
   max-height: 140px;
   overflow-y: auto;
+  overflow-x: auto;
   white-space: pre-wrap;
 }
 

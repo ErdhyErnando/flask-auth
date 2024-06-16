@@ -9,7 +9,7 @@ def increment():
     a[0] = 0
     b[0] = 0
     stop[0] = 0
-    while a[0] < 20000000 and b[0] > -20000000:
+    while a[0] < 100 and b[0] > -100:
         a[0] += 1
         b[0] -= 1
         time.sleep(0.1)

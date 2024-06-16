@@ -1,7 +1,10 @@
 import time
 
-# Loop forever
-while True:
+# Get the start time
+start_time = time.time()
+
+# Loop until 10 seconds have passed
+while time.time() - start_time < 5:
   # Get the current time
   current_time = time.strftime("%H:%M:%S")
 

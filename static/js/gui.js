@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var labelElement = document.getElementById("hiddenFileInput");
   selectElement.addEventListener("change", function () {
     var selectedText = selectElement.options[selectElement.selectedIndex].text;
-    var filename = selectedText.split("\\").pop();
+    var filename = selectedText.split('/').pop();
     labelElement.textContent = filename;
   });
 });

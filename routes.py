@@ -6,7 +6,10 @@ import os
 import subprocess
 import threading
 
-SCRIPTS_DIR = 'C:\\Users\\Erdhy Ernando\\Desktop\\Dev\\flask-auth\\orthosis-scripts'
+import select
+
+# SCRIPTS_DIR = 'C:\\Users\\Erdhy Ernando\\Desktop\\Dev\\flask-auth\\orthosis-scripts'
+RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'
 
 def register_routes(app, db, bcrypt, socketio):
     global running_thread, stop_thread
@@ -16,23 +19,28 @@ def register_routes(app, db, bcrypt, socketio):
     def run_script_continuous(script_name):
         global stop_thread
         stop_thread = False
+
         try:
-            process = subprocess.Popen(['python', script_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            process = subprocess.Popen(['python3', script_name],
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE,
+                                        text=True,
+                                        bufsize=1)
             while True:
                 if stop_thread:
                     process.terminate()
                     break
 
-                output = process.stdout.readline()
-                if output:
-                    socketio.emit('script_output', {'output': output}, namespace='/')
-                else:
-                    break
+                ready_to_read, _, _ = select.select([process.stdout], [], [], 0.1)
+                if ready_to_read:
+                    output = process.stdout.readline()
+                    if output:
+                        socketio.emit('script_output', {'output': output}, namespace='/')
+                    elif process.poll() is not None:
+                        break
 
-            for output in process.stdout.readlines():
-                socketio.emit('script_output', {'output': output}, namespace='/')
-            for output in process.stderr.readlines():
-                socketio.emit('script_output', {'output': output}, namespace='/')
+            process.stdout.close()
+            process.stderr.close()
 
         except Exception as e:
             socketio.emit('script_output', {'output': str(e)}, namespace='/')
@@ -106,7 +114,8 @@ def register_routes(app, db, bcrypt, socketio):
     def gui():
         if request.method == 'POST':
             selected_script = request.form.get('script')
-            script_path = os.path.join(SCRIPTS_DIR, selected_script)
+            # script_path = os.path.join(SCRIPTS_DIR, selected_script)
+            script_path = os.path.join(RASP_DIR, selected_script)
             if os.path.exists(script_path):
                 socketio.emit('start_script', {'filename': script_path}, namespace='/')
             else:
@@ -120,7 +129,8 @@ def register_routes(app, db, bcrypt, socketio):
             file = request.files['file']
             if file and file.filename.endswith('.py'):
                 # Ensure the folder exists
-                folder_path = SCRIPTS_DIR
+                # folder_path = SCRIPTS_DIR
+                folder_path = RASP_DIR
                 if not os.path.exists(folder_path):
                     os.makedirs(folder_path)
                 file_path = os.path.join(folder_path, file.filename)
@@ -139,7 +149,8 @@ def register_routes(app, db, bcrypt, socketio):
     
 def get_scripts():
     scripts = []
-    for root, dirs, files in os.walk(SCRIPTS_DIR):
+    # for root, dirs, files in os.walk(SCRIPTS_DIR):
+    for root, dirs, files in os.walk(RASP_DIR):
         for filename in files:
             if filename.endswith('.py'):
                 script_path = os.path.join(root, filename)

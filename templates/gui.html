@@ -27,7 +27,7 @@
 
         <!-- TODO: add real chart.js-->
         <div class="gui__graph">
-            <img src="/public/graph.png" alt="graph" class="graph__image">
+            <canvas id="myChart"></canvas>
         </div>
 
         <!-- TODO: CHANGE TO DYNAMIC LATER-->
@@ -76,7 +76,40 @@
 
 </body>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+
+    // Create a new Chart.js instance
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [], // You will fill this array with your labels
+            datasets: [{
+                label: 'Positive Results',
+                data: [], // You will fill this array with your positive data
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Negative Results',
+                data: [], // You will fill this array with your negative data
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // socketio connnection
     document.addEventListener("DOMContentLoaded", function () {
         var socket = io.connect("http://" + document.domain + ":" + location.port);
 
@@ -84,6 +117,7 @@
             document.getElementById("scriptSelector").click();
         });
 
+        // choose file and display the file name
         var selectElement = document.getElementById("scriptSelector");
         var labelElement = document.getElementById("hiddenFileInput");
         selectElement.addEventListener("change", function () {
@@ -92,6 +126,7 @@
             labelElement.textContent = filename;
         });
 
+        // Modal for confirmation
         var startButton = document.getElementById("startButton");
         var stopButton = document.getElementById("stopButton");
         var modal = document.getElementById("commandModal");
@@ -99,6 +134,7 @@
         var confirmButton = document.getElementById("confirmButton");
         var commandText = document.getElementById("commandText");
 
+        // Event listeners for parameters 
         startButton.addEventListener("click", function (event) {
             event.preventDefault();
             var selectedFile = document.getElementById("scriptSelector").value;
@@ -115,7 +151,9 @@
                 .map(key => `--${key} ${params[key]}`)
                 .join(" ");
 
-            var filename = selectedFile.split('/').pop();  // Extract the file name only
+
+            // Extract the file name only in modal
+            var filename = selectedFile.split('/').pop();
             var command = `python3 ${paramStr} ${filename} `;
             commandText.textContent = command;
             modal.style.display = "block";
@@ -135,15 +173,37 @@
             modal.style.display = "none";
         });
 
+
+        // stop button
         stopButton.addEventListener("click", function (event) {
             event.preventDefault();
             socket.emit("stop_script");
         });
 
+        // script output
         socket.on("script_output", function (data) {
             var outputElement = document.getElementById("output");
             outputElement.textContent += data.output; // Append new output with a newline
             outputElement.scrollTop = outputElement.scrollHeight; // Auto scroll to the bottom
+
+            var parts = data.output.split(":")
+            var label = parts[0];
+            var dataPoints = parts.slice(1).map(Number);
+
+            // Separate positive and negative results
+            var positiveDataPoint = dataPoints.find(value => value >= 0);
+            var negativeDataPoint = dataPoints.find(value => value < 0);
+
+            myChart.data.labels.push(label);
+            if (positiveDataPoint !== undefined) {
+                myChart.data.datasets[0].data.push(positiveDataPoint);
+            }
+            if (negativeDataPoint !== undefined) {
+                myChart.data.datasets[1].data.push(negativeDataPoint);
+            }
+            myChart.update();
+
+
         });
 
         span.onclick = function () {

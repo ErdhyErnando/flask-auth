@@ -28,7 +28,7 @@
             <h2>Add New File</h2>
         </div>
 
-        <form id="uploadForm" enctype="multipart/form-data">
+        <form id="uploadForm" action="/uploadfile" method="post" enctype="multipart/form-data">
             <div class="uploadfile__title">
                 <label for="title">Title</label>
                 <input type="text" id="title" name="title" required>
@@ -37,11 +37,15 @@
 
             <div class="uploadfile__upload">
                 <label for="file">Attach File</label>
-                <!-- Input the file -->
                 <div class="uploadfile__uploadtext">
                     <input type="file" id="hiddenFileInput" name="file" class="uploadfile__fileinput" required>
                     <p>Click here to select a file</p>
                 </div>
+            </div>
+
+            <div class="uploadfile__label">
+                <label for="outputLabel">Output Label</label>
+                <input type="text" id="outputLabel" name="outputLabel" required>
             </div>
 
             <div class="uploadfile__progress">
@@ -65,25 +69,27 @@
         document.getElementById('uploadForm').addEventListener('submit', function (event) {
             event.preventDefault();
 
-            var title = document.getElementById('title').value;
-            var fileInput = document.getElementById('hiddenFileInput');
-            var file = fileInput.files[0];
-            var formData = new FormData();
+            let title = document.getElementById('title').value;
+            let outputLabel = document.getElementById('outputLabel').value;
+            let fileInput = document.getElementById('hiddenFileInput');
+            let file = fileInput.files[0];
+            let formData = new FormData();
             formData.append('title', title);
+            formData.append('outputLabel', outputLabel);
             formData.append('file', file);
 
-            var xhr = new XMLHttpRequest();
+            let xhr = new XMLHttpRequest();
             xhr.open('POST', '{{ url_for("uploadfile") }}', true);
 
             xhr.upload.onprogress = function (event) {
                 if (event.lengthComputable) {
-                    var percentComplete = (event.loaded / event.total) * 100;
+                    let percentComplete = (event.loaded / event.total) * 100;
                     document.getElementById('fileUploadProgress').value = percentComplete;
                     document.getElementById('progress-label').innerHTML = Math.round(percentComplete) + "%";
                 }
             };
 
-            // show uplaod progress and feedback
+            // show upload progress and feedback
             xhr.onload = function () {
                 if (xhr.status == 200) {
                     document.getElementById('feedback').innerHTML = '<span>File <u>' + file.name + '</u> has been uploaded successfully.</span>';
@@ -100,15 +106,15 @@
         });
 
 
-        // add file title to the upload text
+        // add file title to the upload text 
         document.getElementById('hiddenFileInput').addEventListener('change', function () {
-            var filename = this.files[0].name;
+            let filename = this.files[0].name;
             document.querySelector('.uploadfile__uploadtext p').textContent = filename;
         });
 
         // autiomatically add file title to the title input
         document.getElementById('hiddenFileInput').addEventListener('change', function () {
-            var filename = this.files[0].name;
+            let filename = this.files[0].name;
             document.querySelector('.uploadfile__uploadtext p').textContent = filename;
             document.getElementById('title').value = filename;
         });

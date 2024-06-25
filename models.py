@@ -29,3 +29,7 @@ class User(db.Model, UserMixin):
     def get_id(self):
         return self.uid
 
+class ScriptLabels(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    script_name = db.Column(db.String(100), unique=True, nullable=False)
+    Labels = db.Column(db.String(100), nullable=False)

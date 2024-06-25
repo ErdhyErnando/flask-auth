@@ -69,6 +69,18 @@
   border-radius: 10px;
 }
 
+.uploadfile__label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.uploadfile__label input {
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
 #feedback {
   display: flex;
   justify-content: center;

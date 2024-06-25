@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
-from models import User
+from models import User, ScriptLabels
 from flask_socketio import emit
 import os
 import subprocess
@@ -8,6 +8,8 @@ import threading
 import zmq
 import time
 import select
+
+from werkzeug.utils import secure_filename
 
 # SCRIPTS_DIR = 'C:\\Users\\Erdhy Ernando\\Desktop\\Dev\\flask-auth\\orthosis-scripts'
 # RASP_DIR = '/home/mhstrake28/flask-auth/orthosis-scripts'
@@ -113,6 +115,36 @@ def register_routes(app, db, bcrypt, socketio):
     def internal_server_error(e):
         return render_template('500.html'), 500
 
+    @app.route('/uploadfile', methods=['GET', 'POST'])
+    def uploadfile(): 
+        if request.method == 'POST':
+            file = request.files['file']
+            title = request.form['title']
+            output_label = request.form['outputLabel']
+
+            if file and file.filename.endswith('.py'):
+                folder_path = RASP_DIR
+                if not os.path.exists(folder_path):
+                    os.makedirs(folder_path)
+                file_path = os.path.join(folder_path, file.filename)
+                
+                # Save the file
+                file.save(file_path)
+
+                # Save the label to db
+                new_label = ScriptLabels(script_name=file.filename, Labels=output_label)
+                db.session.add(new_label)
+                db.session.commit()
+
+                # Log for debugging
+                print(f"File saved to: {file_path}")
+                
+                flash('File and label uploaded successfully', 'success')
+            else:
+                flash('Please select a valid python file', 'error')
+        return render_template('uploadfile.html')
+
+
     @app.route('/gui', methods=['GET', 'POST'])
     def gui():
         if request.method == 'POST':
@@ -123,31 +155,11 @@ def register_routes(app, db, bcrypt, socketio):
                 socketio.emit('start_script', {'filename': script_path}, namespace='/')
             else:
                 socketio.emit('script_output', {'output': 'Script not found'}, namespace='/')
-        return render_template('gui.html', scripts=get_scripts())  
-    
-    
-    @app.route('/uploadfile', methods=['GET', 'POST'])
-    def uploadfile(): 
-        if request.method == 'POST':
-            file = request.files['file']
-            if file and file.filename.endswith('.py'):
-                # Ensure the folder exists
-                # folder_path = SCRIPTS_DIR
-                folder_path = RASP_DIR
-                if not os.path.exists(folder_path):
-                    os.makedirs(folder_path)
-                file_path = os.path.join(folder_path, file.filename)
-                
-                # Save the file
-                file.save(file_path)
-                
-                # Log for debugging
-                print(f"File saved to: {file_path}")
-                
-                flash('File uploaded successfully', 'success')
-            else:
-                flash('Please select a valid python file', 'error')
-        return render_template('uploadfile.html')
+        
+        labels = ScriptLabels.query.all()
+        return render_template('gui.html', scripts=get_scripts(), labels=[label.name for label in labels])  
+
+
         
     
 def get_scripts():

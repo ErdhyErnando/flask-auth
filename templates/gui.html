@@ -80,6 +80,7 @@
 <script>
 
     // Create a new Chart.js instance
+    var labels = {{ labels | tojson}}
     var ctx = document.getElementById('myChart').getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'line',
@@ -101,11 +102,9 @@
             }]
         },
         options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.5,
         }
     });
 
@@ -188,6 +187,7 @@
 
             var parts = data.output.split(":")
             var label = parts[0];
+            myChart.data.labels.push(label);
             var dataPoints = parts.slice(1).map(Number);
 
             // Separate positive and negative results

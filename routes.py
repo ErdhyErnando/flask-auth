@@ -11,14 +11,12 @@ import select
 
 from werkzeug.utils import secure_filename
 
-# SCRIPTS_DIR = 'C:\\Users\\Erdhy Ernando\\Desktop\\Dev\\flask-auth\\orthosis-scripts'
-# RASP_DIR = '/home/mhstrake28/flask-auth/orthosis-scripts'
 RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'
 
 def register_routes(app, db, bcrypt, socketio):
     global running_thread, stop_thread
     running_thread = None
-    stop_thread = False
+    stop_thread = False 
 
     def run_script_continuous(script_name):
         global stop_thread
@@ -144,24 +142,47 @@ def register_routes(app, db, bcrypt, socketio):
                 flash('Please select a valid python file', 'error')
         return render_template('uploadfile.html')
 
+    # @app.route('/get-labels')
+    # def get_labels():
+    #     script_name = request.args.get('script')
+    #     labels_entry = ScriptLabels.query.filter_by(script_name=script_name).first()
+    #     if labels_entry:
+    #         labels = labels_entry.Labels.split(',')
+    #         return jsonify({'labels': labels})
+    #     return jsonify({'labels': []})
 
+    @app.route('/get-labels')
+    def get_labels():
+        script_name = request.args.get('script')
+        label = ScriptLabels.query.filter_by(script_name=script_name).first()
+        if label:
+            return jsonify({'labels': label.Labels.split(',')})  # Assuming labels are comma-separated
+        else:
+            return jsonify({'labels': []}), 404
+         
     @app.route('/gui', methods=['GET', 'POST'])
     def gui():
         if request.method == 'POST':
             selected_script = request.form.get('script')
-            # script_path = os.path.join(SCRIPTS_DIR, selected_script)
             script_path = os.path.join(RASP_DIR, selected_script)
+
             if os.path.exists(script_path):
                 socketio.emit('start_script', {'filename': script_path}, namespace='/')
             else:
                 socketio.emit('script_output', {'output': 'Script not found'}, namespace='/')
         
-        labels = ScriptLabels.query.all()
-        return render_template('gui.html', scripts=get_scripts(), labels=[label.name for label in labels])  
+        labels_query = ScriptLabels.query.all()
+        labels_data = {}
 
-
+        # labels for chartjs
+        for label_entry in labels_query:
+            labels_data[label_entry.script_name] = label_entry.Labels.split(',')
         
-    
+        scripts = get_scripts()
+
+        return render_template('gui.html', scripts=scripts, labels_data=labels_data)  
+
+
 def get_scripts():
     scripts = []
     # for root, dirs, files in os.walk(SCRIPTS_DIR):

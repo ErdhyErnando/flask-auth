@@ -24,17 +24,13 @@
 <body>
     <!-- Graph and Output-->
     <section class="gui__graphoutput">
-
-        <!-- TODO: add real chart.js-->
         <div class="gui__graph">
             <canvas id="myChart"></canvas>
         </div>
 
-        <!-- TODO: CHANGE TO DYNAMIC LATER-->
         <div class="gui__output">
             <pre id="output"></pre>
         </div>
-
     </section>
 
     <!-- Choose File and Parameter -->
@@ -78,66 +74,76 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-
-    // Create a new Chart.js instance
-    var labels = {{ labels | tojson}}
-    var ctx = document.getElementById('myChart').getContext('2d');
-    var myChart = new Chart(ctx, {
+    // Initialize Chart.js
+    let ctx = document.getElementById('myChart').getContext('2d');
+    let myChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: [], // You will fill this array with your labels
-            datasets: [{
-                label: 'Positive Results',
-                data: [], // You will fill this array with your positive data
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            },
-            {
-                label: 'Negative Results',
-                data: [], // You will fill this array with your negative data
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                borderColor: 'rgba(255, 99, 132, 1)',
-                borderWidth: 1
-            }]
+            labels: [],
+            datasets: []
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            aspectRatio: 1.5,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
         }
     });
 
-    // socketio connnection
-    document.addEventListener("DOMContentLoaded", function () {
-        var socket = io.connect("http://" + document.domain + ":" + location.port);
+    // Handle script selection change
+    document.getElementById('scriptSelector').addEventListener('change', function () {
+        let scriptName = this.value.split('/').pop();
+        fetch(`/get-labels?script=${scriptName}`)
+            .then(response => response.json())
+            .then(data => {
+                // Update chart labels
+                myChart.data.labels = data.labels;
 
+                // Reset and initialize datasets for each label
+                myChart.data.datasets = data.labels.map((label, index) => ({
+                    label: label,
+                    data: [],
+                    backgroundColor: `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},0.2)`,
+                    borderColor: `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},1)`,
+                    borderWidth: 1
+                }));
+
+                myChart.update();
+            });
+    });
+
+
+    // Initialize socket.io connnection
+    document.addEventListener("DOMContentLoaded", function () {
+        let socket = io.connect("http://" + document.domain + ":" + location.port);
+
+        // Handle file selection click
         document.querySelector(".gui__file").addEventListener("click", function () {
             document.getElementById("scriptSelector").click();
         });
 
-        // choose file and display the file name
-        var selectElement = document.getElementById("scriptSelector");
-        var labelElement = document.getElementById("hiddenFileInput");
+        // update file name display
+        let selectElement = document.getElementById("scriptSelector");
+        let labelElement = document.getElementById("hiddenFileInput");
         selectElement.addEventListener("change", function () {
-            var selectedText = selectElement.options[selectElement.selectedIndex].text;
-            var filename = selectedText.split('/').pop();  // Get the file name only
-            labelElement.textContent = filename;
+            let selectedText = selectElement.options[selectElement.selectedIndex].text;
+            labelElement.textContent = selectedText.split('/').pop();
         });
 
         // Modal for confirmation
-        var startButton = document.getElementById("startButton");
-        var stopButton = document.getElementById("stopButton");
-        var modal = document.getElementById("commandModal");
-        var span = document.getElementsByClassName("close")[0];
-        var confirmButton = document.getElementById("confirmButton");
-        var commandText = document.getElementById("commandText");
+        let startButton = document.getElementById("startButton");
+        let stopButton = document.getElementById("stopButton");
+        let modal = document.getElementById("commandModal");
+        let span = document.getElementsByClassName("close")[0];
+        let confirmButton = document.getElementById("confirmButton");
+        let commandText = document.getElementById("commandText");
 
-        // Event listeners for parameters 
+        // Handle start button click
         startButton.addEventListener("click", function (event) {
             event.preventDefault();
-            var selectedFile = document.getElementById("scriptSelector").value;
-            var params = {
+            let selectedFile = document.getElementById("scriptSelector").value;
+            let params = {
                 param1: document.getElementById("param1").value,
                 param2: document.getElementById("param2").value,
                 param3: document.getElementById("param3").value,
@@ -145,22 +151,23 @@
                 param5: document.getElementById("param5").value
             };
 
-            var paramStr = Object.keys(params)
+            let paramStr = Object.keys(params)
                 .filter(key => params[key] !== "")
                 .map(key => `--${key} ${params[key]}`)
                 .join(" ");
 
 
             // Extract the file name only in modal
-            var filename = selectedFile.split('/').pop();
-            var command = `python3 ${paramStr} ${filename} `;
+            let filename = selectedFile.split('/').pop();
+            let command = `python3 ${paramStr} ${filename} `;
             commandText.textContent = command;
             modal.style.display = "block";
         });
 
+        // Handle confirmation button click
         confirmButton.addEventListener("click", function () {
-            var selectedFile = document.getElementById("scriptSelector").value;
-            var params = {
+            let selectedFile = document.getElementById("scriptSelector").value;
+            let params = {
                 param1: document.getElementById("param1").value,
                 param2: document.getElementById("param2").value,
                 param3: document.getElementById("param3").value,
@@ -173,39 +180,33 @@
         });
 
 
-        // stop button
+        // Handle stop button
         stopButton.addEventListener("click", function (event) {
             event.preventDefault();
             socket.emit("stop_script");
         });
 
-        // script output
+        // Handle script output
         socket.on("script_output", function (data) {
-            var outputElement = document.getElementById("output");
-            outputElement.textContent += data.output; // Append new output with a newline
+            let outputElement = document.getElementById("output");
+            outputElement.textContent += data.output; // Append new output
             outputElement.scrollTop = outputElement.scrollHeight; // Auto scroll to the bottom
 
-            var parts = data.output.split(":")
-            var label = parts[0];
-            myChart.data.labels.push(label);
-            var dataPoints = parts.slice(1).map(Number);
+            let parts = data.output.split(":")
+            let label = parts[0];
+            let dataPoints = parts.slice(1).map(Number);
 
-            // Separate positive and negative results
-            var positiveDataPoint = dataPoints.find(value => value >= 0);
-            var negativeDataPoint = dataPoints.find(value => value < 0);
-
+            // update chart data
             myChart.data.labels.push(label);
-            if (positiveDataPoint !== undefined) {
-                myChart.data.datasets[0].data.push(positiveDataPoint);
-            }
-            if (negativeDataPoint !== undefined) {
-                myChart.data.datasets[1].data.push(negativeDataPoint);
-            }
+            dataPoints.forEach((point, index) => {
+                if (myChart.data.datasets[index]) {
+                    myChart.data.datasets[index].data.push(point);
+                }
+            });
             myChart.update();
-
-
         });
 
+        // close modal
         span.onclick = function () {
             modal.style.display = "none";
         };
@@ -216,7 +217,6 @@
             }
         };
     });
-
 </script>
 
 </html>

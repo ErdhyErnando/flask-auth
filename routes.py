@@ -11,7 +11,7 @@ import select
 
 from werkzeug.utils import secure_filename
 
-RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'
+RASP_DIR = '/home/pi/flask-auth/orthosis_interface'
 
 def register_routes(app, db, bcrypt, socketio):
     global running_thread, stop_thread
@@ -180,7 +180,7 @@ def register_routes(app, db, bcrypt, socketio):
         
         scripts = get_scripts()
 
-        return render_template('gui.html', scripts=scripts, labels_data=labels_data)  
+        return render_template('gui2.html', scripts=scripts, labels_data=labels_data)  
 
 
 def get_scripts():

@@ -12,8 +12,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,
-    wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/static/css/styles.css">
     <link rel="stylesheet" href="/static/css/gui.css">
     <link rel="stylesheet" href="/static/css/utils.css">
@@ -91,30 +91,7 @@
         }
     });
 
-    // Handle script selection change
-    /*  document.getElementById('scriptSelector').addEventListener('change', function () {
-          let scriptName = this.value.split('/').pop();
-          fetch(`/get-labels?script=${scriptName}`)
-              .then(response => response.json())
-              .then(data => {
-                  // Update chart labels
-                  myChart.data.labels = data.labels;
-  
-                  // Reset and initialize datasets for each label
-                  myChart.data.datasets = data.labels.map((label, index) => ({
-                      label: label,
-                      data: [],
-                      backgroundColor: `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},0.2)`,
-                      borderColor: `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},1)`,
-                      borderWidth: 1
-                  }));
-  
-                  myChart.update();
-              });
-      }); 
-      */
-
-    // Initialize socket.io connnection
+    // Initialize socket.io connection
     document.addEventListener("DOMContentLoaded", function () {
         let socket = io.connect("http://" + document.domain + ":" + location.port);
 
@@ -123,7 +100,7 @@
             document.getElementById("scriptSelector").click();
         });
 
-        // update file name display
+        // Update file name display
         let selectElement = document.getElementById("scriptSelector");
         let labelElement = document.getElementById("hiddenFileInput");
         selectElement.addEventListener("change", function () {
@@ -156,10 +133,9 @@
                 .map(key => `--${key} ${params[key]}`)
                 .join(" ");
 
-
             // Extract the file name only in modal
             let filename = selectedFile.split('/').pop();
-            let command = `python3 ${paramStr} ${filename} `;
+            let command = `python3 ${paramStr} ${filename}`;
             commandText.textContent = command;
             modal.style.display = "block";
         });
@@ -179,7 +155,6 @@
             modal.style.display = "none";
         });
 
-
         // Handle stop button
         stopButton.addEventListener("click", function (event) {
             event.preventDefault();
@@ -192,12 +167,25 @@
             outputElement.textContent += data.output; // Append new output
             outputElement.scrollTop = outputElement.scrollHeight; // Auto scroll to the bottom
 
-            // split and parse data output
-            let parts = data.output.split(":")
-            let labels = parts.filter((part, index) => index % 2 === 0); // Extract labels
-            let values = parts.filter((part, index) => index % 2 !== 0).map(Number);
+            // Example output: label1: value1, label2: value2, ...
+            let parts = data.output.trim().split(", ");
+            let labels = [];
+            let values = [];
 
-            // update chart labels and datasets
+            parts.forEach(part => {
+                let [label, value] = part.split(": ");
+                if (label && value) {
+                    labels.push(label);
+                    values.push(Number(value));
+                }
+            });
+
+            // Ensure each new data point adds a new label to the chart
+            if (myChart.data.labels.length < values.length) {
+                myChart.data.labels.push(myChart.data.labels.length + 1);
+            }
+
+            // Update chart datasets
             labels.forEach((label, index) => {
                 let dataset = myChart.data.datasets.find(ds => ds.label === label);
                 if (dataset) {
@@ -205,17 +193,18 @@
                 } else {
                     myChart.data.datasets.push({
                         label: label,
-                        data: [values[index]],
+                        data: Array(myChart.data.labels.length - 1).fill(null).concat(values[index]),
                         backgroundColor: `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},0.2)`,
                         borderColor: `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},1)`,
-                        borderWidth: 1
+                        borderWidth: 1,
+                        spanGaps: true
                     });
                 }
             });
             myChart.update();
         });
 
-        // close modal
+        // Close modal
         span.onclick = function () {
             modal.style.display = "none";
         };
@@ -227,6 +216,7 @@
         };
     });
 </script>
+
 
 </html>
 

@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="/static/css/gui.css">
     <link rel="stylesheet" href="/static/css/utils.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <title>GUI Mode</title>
 </head>
 
@@ -47,11 +48,14 @@
         </div>
 
         <div class="gui__param">
-            <input type="text" id="param1" name="param1" placeholder="Param 1">
-            <input type="text" id="param2" name="param2" placeholder="Param 2">
-            <input type="text" id="param3" name="param3" placeholder="Param 3">
-            <input type="text" id="param4" name="param4" placeholder="Param 4">
-            <input type="text" id="param5" name="param5" placeholder="Param 5">
+            <input type="text" id="param1" class="param-input" name="param1" placeholder="Param 1">
+            <input type="text" id="param2" class="param-input" name="param2" placeholder="Param 2">
+            <input type="text" id="param3" class="param-input" name="param3" placeholder="Param 3">
+            <input type="text" id="param4" class="param-input" name="param4" placeholder="Param 4">
+            <input type="text" id="param5" class="param-input" name="param5" placeholder="Param 5">
+
+            <!-- Button to show more parameters -->
+            <button id="showMoreParams" class="add-param-button">Add Params</button>
         </div>
 
         <div class="gui__btnwrapper">
@@ -108,6 +112,16 @@
             labelElement.textContent = selectedText.split('/').pop();
         });
 
+        // add param
+        $(document).on('click', '.add-param-button', function () {
+            let currentParams = $('.param-input').length;
+            let newParamEnd = Math.min(currentParams + 1, 20);
+
+            for (let i = currentParams + 1; i <= newParamEnd; i++) {
+                $('<input type="text" class="param-input" id="param' + (i) + '" name="param' + (i) + '" placeholder="Param ' + (i) + '">').insertBefore('.add-param-button');
+            }
+        });
+
         // Modal for confirmation
         let startButton = document.getElementById("startButton");
         let stopButton = document.getElementById("stopButton");
@@ -120,17 +134,17 @@
         startButton.addEventListener("click", function (event) {
             event.preventDefault();
             let selectedFile = document.getElementById("scriptSelector").value;
-            let params = {
-                param1: document.getElementById("param1").value,
-                param2: document.getElementById("param2").value,
-                param3: document.getElementById("param3").value,
-                param4: document.getElementById("param4").value,
-                param5: document.getElementById("param5").value
-            };
+
+            // gather parameters
+            let params = {};
+            $('.param-input').each(function (index, element) {
+                let paramId = element.id;
+                params[paramId] = element.value;
+            });
 
             let paramStr = Object.values(params)
                 .filter(value => value !== "")
-                .join(" ");
+                .join("  ");
 
             // Extract the file name only in modal
             let filename = selectedFile.split('/').pop();
@@ -142,13 +156,14 @@
         // Handle confirmation button click
         confirmButton.addEventListener("click", function () {
             let selectedFile = document.getElementById("scriptSelector").value;
-            let params = {
-                param1: document.getElementById("param1").value,
-                param2: document.getElementById("param2").value,
-                param3: document.getElementById("param3").value,
-                param4: document.getElementById("param4").value,
-                param5: document.getElementById("param5").value
-            };
+
+            // gather parameters
+            let params = {};
+            $('.param-input').each(function (index, element) {
+                let paramId = element.id;
+                params[paramId] = element.value;
+            });
+
             document.getElementById("output").textContent = ""; // Clear output area
             socket.emit("start_script", { filename: selectedFile, params: params });
             modal.style.display = "none";
@@ -214,8 +229,8 @@
             }
         };
     });
-</script>
 
+</script>
 
 </html>
 

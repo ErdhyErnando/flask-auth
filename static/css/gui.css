@@ -134,6 +134,36 @@ input::placeholder {
   font-family: "DM Mono", monospace;
 }
 
+input.param-input {
+  border-radius: 10px;
+  width: 100%;
+  padding: 10px 10px;
+  margin: 5px 0px;
+}
+
+input.param-input::placeholder {
+  font-family: "DM Mono", monospace;
+}
+
+.add-param-button {
+  border-radius: 10px;
+  font-family: DM Mono, monospace;
+  padding: 8px 10px;
+  margin: 5px 0px;
+  background-color: #007bff;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.add-param-button:hover {
+  background-color: #0056b3;
+  color: #ffffff;
+  border: 2px solid #f8f8f8;
+}
+
+
 .gui__btnwrapper {
   display: flex;
   justify-content: center;

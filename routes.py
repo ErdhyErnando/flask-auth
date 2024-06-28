@@ -14,6 +14,16 @@ from werkzeug.utils import secure_filename
 RASP_DIR = '/home/mhstrake28/flask-auth/orthosis_interface' # for hanif's linux
 # RASP_DIR = '/home/pi/flask-auth/orthosis_interface' ; for raspberry pi
 
+# Param parser for run_script_continuous()
+def split_args(args):
+    split_args = []
+    for arg in args:
+        if ' ' in arg:
+            split_args.extend(arg.split())
+        else:
+            split_args.append(arg)
+    return split_args
+
 def register_routes(app, db, bcrypt, socketio):
     global running_thread, stop_thread
     running_thread = None
@@ -32,7 +42,8 @@ def register_routes(app, db, bcrypt, socketio):
             socket.connect(f"tcp://localhost:{port}")
             # Subscribes to all topics
             socket.subscribe("")
-            process = subprocess.Popen(['python3', script_name] + list(params.values()))
+            listPar = split_args(list(params.values()))
+            process = subprocess.Popen(['python3', script_name] + listPar)
             while True:
                 if stop_thread:
                     process.terminate()

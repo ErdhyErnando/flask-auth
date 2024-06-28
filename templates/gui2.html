@@ -128,14 +128,13 @@
                 param5: document.getElementById("param5").value
             };
 
-            let paramStr = Object.keys(params)
-                .filter(key => params[key] !== "")
-                .map(key => `--${key} ${params[key]}`)
+            let paramStr = Object.values(params)
+                .filter(value => value !== "")
                 .join(" ");
 
             // Extract the file name only in modal
             let filename = selectedFile.split('/').pop();
-            let command = `python3 ${paramStr} ${filename}`;
+            let command = `python3 ${filename} ${paramStr}`;
             commandText.textContent = command;
             modal.style.display = "block";
         });

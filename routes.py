@@ -11,14 +11,15 @@ import select
 
 from werkzeug.utils import secure_filename
 
-RASP_DIR = '/home/pi/flask-auth/orthosis_interface'
+RASP_DIR = '/home/mhstrake28/flask-auth/orthosis_interface' # for hanif's linux
+# RASP_DIR = '/home/pi/flask-auth/orthosis_interface' ; for raspberry pi
 
 def register_routes(app, db, bcrypt, socketio):
     global running_thread, stop_thread
     running_thread = None
     stop_thread = False 
 
-    def run_script_continuous(script_name):
+    def run_script_continuous(script_name, params):
         global stop_thread
         stop_thread = False
 
@@ -31,7 +32,7 @@ def register_routes(app, db, bcrypt, socketio):
             socket.connect(f"tcp://localhost:{port}")
             # Subscribes to all topics
             socket.subscribe("")
-            process = subprocess.Popen(['python3', script_name])
+            process = subprocess.Popen(['python3', script_name] + list(params.values()))
             while True:
                 if stop_thread:
                     process.terminate()
@@ -52,10 +53,11 @@ def register_routes(app, db, bcrypt, socketio):
     def start_script(data):
         global running_thread
         filename = data['filename']
+        params = data.get('params', {}) 
         if running_thread and running_thread.is_alive():
             emit('script_output', {'output': 'A script is already running.'}, namespace='/')
         else:
-            running_thread = threading.Thread(target=run_script_continuous, args=(filename,))
+            running_thread = threading.Thread(target=run_script_continuous, args=(filename, params))
             running_thread.start()
 
     @socketio.on('stop_script')

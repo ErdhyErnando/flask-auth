@@ -11,8 +11,8 @@ import select
 
 from werkzeug.utils import secure_filename
 
-RASP_DIR = '/home/mhstrake28/flask-auth/orthosis_interface' # for hanif's linux
-# RASP_DIR = '/home/pi/flask-auth/orthosis_interface' ; for raspberry pi
+ # RASP_DIR = '/home/mhstrake28/flask-auth/orthosis_interface' # for hanif's linux
+RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
 
 # Param parser for run_script_continuous()
 def split_args(args):
@@ -193,7 +193,7 @@ def register_routes(app, db, bcrypt, socketio):
         
         scripts = get_scripts()
 
-        return render_template('gui2.html', scripts=scripts, labels_data=labels_data)  
+        return render_template('gui3.html', scripts=scripts, labels_data=labels_data)  
 
 
 def get_scripts():

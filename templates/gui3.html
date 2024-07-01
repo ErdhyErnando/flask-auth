@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %} GUI Mode {% endblock%}
+
+{% block content %}
+{% if current_user.is_authenticated %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/gui.css">
+    <link rel="stylesheet" href="/static/css/utils.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <title>GUI Mode</title>
+</head>
+
+<body>
+    <!-- Graph and Output-->
+    <section class="gui__graphoutput">
+        <div class="gui__graph">
+            <canvas id="myChart"></canvas>
+        </div>
+
+        <div class="gui__output">
+            <pre id="output"></pre>
+        </div>
+    </section>
+
+    <!-- Choose File and Parameter -->
+    <section class="gui__fileandparam">
+        <div class="gui__file">
+            <label for="scriptSelect" id="hiddenFileInput" class="gui__filelabel">Choose Files</label>
+            <div class="gui__selectwrapper">
+                <select name="script" id="scriptSelector">
+                    {% for script in scripts %}
+                    <option value="{{ script }}">{{ script }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="gui__param">
+            <input type="text" id="param1" class="param-input" name="param1" placeholder="Param 1">
+            <input type="text" id="param2" class="param-input" name="param2" placeholder="Param 2">
+            <input type="text" id="param3" class="param-input" name="param3" placeholder="Param 3">
+            <input type="text" id="param4" class="param-input" name="param4" placeholder="Param 4">
+            <input type="text" id="param5" class="param-input" name="param5" placeholder="Param 5">
+
+            <!-- Button to show more parameters -->
+            <button id="showMoreParams" class="add-param-button">Add Params</button>
+        </div>
+
+        <div class="gui__btnwrapper">
+            <button id="startButton" class="gui__runbutton">Run</button>
+            <button id="stopButton" class="gui__stopbutton">Stop</button>
+        </div>
+    </section>
+
+    <!-- Modal -->
+    <div id="commandModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="modalMessage">YOU'LL RUN THIS COMMAND, ARE YOU SURE?</p>
+            <p id="commandText"></p>
+            <button id="confirmButton">Confirm</button>
+        </div>
+    </div>
+
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+// add gui2.js from statis/js/gui2.js
+<script src="/static/js/gui2.js"></script>
+
+</html>
+
+{% else %}
+
+<div class="d-flex flex-column justify-content-center align-items-center vh-100">
+    <h2>Access Denied</h2>
+    <p>Please login to access this page</p>
+    <a href="{{ url_for('login') }}" class="btn btn-dark">Login</a>
+</div>
+
+{% endif %}
+
+{% endblock %}

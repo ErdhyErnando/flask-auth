@@ -111,6 +111,19 @@ document.addEventListener("DOMContentLoaded", function () {
     stopButton.addEventListener("click", function (event) {
         event.preventDefault();
         socket.emit("stop_script");
+
+        // Clear output
+        document.getElementById("output").textContent = "";;
+
+        // Reset the chart
+        myChart.data.labels = [];
+        myChart.data.datasets = [];
+        myChart.update();
+    });
+
+    // Handle script stopped
+    socket.on("script_stopped", function () {
+        document.getElementById("output").textContent += "Script stopped by user\n";
     });
 
     // Handle script output (combining both scripts)
@@ -145,15 +158,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             }
         });
-
-        // Limit the number of data points shown (e.g., last 50)
-        const maxDataPoints = 50;
-        if (myChart.data.labels.length > maxDataPoints) {
-            myChart.data.labels = myChart.data.labels.slice(-maxDataPoints);
-            myChart.data.datasets.forEach(dataset => {
-                dataset.data = dataset.data.slice(-maxDataPoints);
-            });
-        }
 
         myChart.update();
     });

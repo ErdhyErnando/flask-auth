@@ -30,7 +30,7 @@ def register_routes(app, db, bcrypt, socketio):
     stop_thread = False 
 
     def run_script_continuous(script_name, params):
-        global stop_thread
+        global stop_thread, process
         stop_thread = False
 
         try:
@@ -50,15 +50,31 @@ def register_routes(app, db, bcrypt, socketio):
                     break
 
                 output = socket.recv_string()
-                if output != "test-0:0:0:0":
+                if output != "STOP":
                     output_with_breaks = output + '\n'
                     socketio.emit('script_output', {'output': output_with_breaks}, namespace='/')
                 else:
+                    print('stop marker received')
+                    socketio.emit('script_output', {'output': 'Script finished'}, namespace='/')
                     break
                 time.sleep(0.1)
 
         except Exception as e:
             socketio.emit('script_output', {'output': str(e)}, namespace='/')
+        finally:
+            if process:
+                process.terminate()
+            process = None
+
+    def terminate_subprocess():
+        global process
+        if process:
+            process.terminate()
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+            process = None
 
     @socketio.on('start_script')
     def start_script(data):
@@ -73,12 +89,18 @@ def register_routes(app, db, bcrypt, socketio):
 
     @socketio.on('stop_script')
     def stop_script():
-        global stop_thread
+        global stop_thread, running_thread
         stop_thread = True
-        if running_thread:
-            running_thread.join()
-            emit('script_output', {'output': 'Script stopped.'}, namespace='/')
+        if running_thread and running_thread.is_alive():
+            running_thread.join(timeout=5)
+            if running_thread.is_alive():
 
+                # If the thread is still alive, we need to force terminate the subprocess
+                terminate_subprocess()
+        emit('script_output', {'output': 'Script stopped.'}, namespace='/')
+
+
+    # Routes
     @app.route('/')
     def index():
         return render_template('index.html')
@@ -118,6 +140,7 @@ def register_routes(app, db, bcrypt, socketio):
         logout_user()
         return redirect(url_for('index'))
 
+    # Error Pages
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template('404.html'), 404
@@ -155,23 +178,6 @@ def register_routes(app, db, bcrypt, socketio):
                 flash('Please select a valid python file', 'error')
         return render_template('uploadfile.html')
 
-    # @app.route('/get-labels')
-    # def get_labels():
-    #     script_name = request.args.get('script')
-    #     labels_entry = ScriptLabels.query.filter_by(script_name=script_name).first()
-    #     if labels_entry:
-    #         labels = labels_entry.Labels.split(',')
-    #         return jsonify({'labels': labels})
-    #     return jsonify({'labels': []})
-
-    @app.route('/get-labels')
-    def get_labels():
-        script_name = request.args.get('script')
-        label = ScriptLabels.query.filter_by(script_name=script_name).first()
-        if label:
-            return jsonify({'labels': label.Labels.split(',')})  # Assuming labels are comma-separated
-        else:
-            return jsonify({'labels': []}), 404
          
     @app.route('/gui', methods=['GET', 'POST'])
     def gui():

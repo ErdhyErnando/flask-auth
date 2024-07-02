@@ -201,7 +201,6 @@ def register_routes(app, db, bcrypt, socketio):
 
         return render_template('gui3.html', scripts=scripts, labels_data=labels_data)  
 
-
 def get_scripts():
     scripts = []
     # for root, dirs, files in os.walk(SCRIPTS_DIR):

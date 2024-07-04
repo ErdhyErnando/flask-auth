@@ -1,3 +1,4 @@
+/*1. Hero Section */
 .hero {
   display: flex;
   justify-content: center;
@@ -67,7 +68,7 @@
   border-radius: 10px 10px 0px 0px;
 }
 
-/* 2. Unautheniticated Login*/
+/* 2. Unautheniticated Login */
 .hero__login {
   /* border: 2px solid red; */
   display: flex;

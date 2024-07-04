@@ -63,6 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let confirmButton = document.getElementById("confirmButton");
     let commandText = document.getElementById("commandText");
 
+
     // Handle start button click
     startButton.addEventListener("click", function (event) {
         event.preventDefault();
@@ -86,6 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
         modal.style.display = "block";
     });
 
+
     // Handle confirmation button click
     confirmButton.addEventListener("click", function () {
         let selectedFile = document.getElementById("scriptSelector").value;
@@ -107,6 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
         modal.style.display = "none";
     });
 
+
     // Handle stop button
     stopButton.addEventListener("click", function (event) {
         event.preventDefault();
@@ -120,6 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
         myChart.data.datasets = [];
         myChart.update();
     });
+
 
     // Handle script stopped
     socket.on("script_stopped", function () {
@@ -161,6 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         myChart.update();
     });
+
 
     // Close modal
     span.onclick = function () {

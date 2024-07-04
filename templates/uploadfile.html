@@ -89,7 +89,7 @@
                 }
             };
 
-            // show upload progress and feedback
+            // Show upload progress and feedback
             xhr.onload = function () {
                 if (xhr.status == 200) {
                     document.getElementById('feedback').innerHTML = '<span>File <u>' + file.name + '</u> has been uploaded successfully.</span>';
@@ -106,13 +106,13 @@
         });
 
 
-        // add file title to the upload text 
+        // Add file title to the upload text 
         document.getElementById('hiddenFileInput').addEventListener('change', function () {
             let filename = this.files[0].name;
             document.querySelector('.uploadfile__uploadtext p').textContent = filename;
         });
 
-        // autiomatically add file title to the title input
+        // Autiomatically add file title to the title input
         document.getElementById('hiddenFileInput').addEventListener('change', function () {
             let filename = this.files[0].name;
             document.querySelector('.uploadfile__uploadtext p').textContent = filename;

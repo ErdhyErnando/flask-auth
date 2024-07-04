@@ -8,6 +8,7 @@ from flask_socketio import SocketIO
 db = SQLAlchemy()
 socketio = SocketIO()
 
+# Create the Flask app
 def create_app():
     app = Flask(__name__, template_folder='templates', static_folder='static')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./testdb.db'

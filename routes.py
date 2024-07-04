@@ -11,24 +11,17 @@ import select
 
 from werkzeug.utils import secure_filename
 
+from utils import split_args, get_scripts
+
  # RASP_DIR = '/home/mhstrake28/flask-auth/orthosis_interface' # for hanif's linux
 RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
-
-# Param parser for run_script_continuous()
-def split_args(args):
-    split_args = []
-    for arg in args:
-        if ' ' in arg:
-            split_args.extend(arg.split())
-        else:
-            split_args.append(arg)
-    return split_args
 
 def register_routes(app, db, bcrypt, socketio):
     global running_thread, stop_thread
     running_thread = None
     stop_thread = False 
 
+    # SocketIO
     def run_script_continuous(script_name, params):
         global stop_thread, process
         stop_thread = False
@@ -76,6 +69,7 @@ def register_routes(app, db, bcrypt, socketio):
                 process.kill()
             process = None
 
+    # SocketIO start and stop script
     @socketio.on('start_script')
     def start_script(data):
         global running_thread
@@ -100,11 +94,12 @@ def register_routes(app, db, bcrypt, socketio):
         emit('script_output', {'output': 'Script stopped.'}, namespace='/')
 
 
-    # Routes
+    # Page routes
     @app.route('/')
     def index():
         return render_template('index.html')
 
+    # Signup and login routes
     @app.route('/signup', methods=['GET', 'POST'])
     def signup():
         if request.method == 'GET':
@@ -140,6 +135,13 @@ def register_routes(app, db, bcrypt, socketio):
         logout_user()
         return redirect(url_for('index'))
 
+    @app.route('/logout_on_close', methods=['POST'])
+    @login_required
+    def logout_on_close():
+        logout_user()
+        return '', 204     
+
+
     # Error Pages
     @app.errorhandler(404)
     def page_not_found(e):
@@ -149,6 +151,8 @@ def register_routes(app, db, bcrypt, socketio):
     def internal_server_error(e):
         return render_template('500.html'), 500
 
+
+    # Script upload and GUI routes
     @app.route('/uploadfile', methods=['GET', 'POST'])
     def uploadfile(): 
         if request.method == 'POST':
@@ -178,7 +182,6 @@ def register_routes(app, db, bcrypt, socketio):
                 flash('Please select a valid python file', 'error')
         return render_template('uploadfile.html')
 
-         
     @app.route('/gui', methods=['GET', 'POST'])
     def gui():
         if request.method == 'POST':
@@ -201,12 +204,4 @@ def register_routes(app, db, bcrypt, socketio):
 
         return render_template('gui3.html', scripts=scripts, labels_data=labels_data)  
 
-def get_scripts():
-    scripts = []
-    # for root, dirs, files in os.walk(SCRIPTS_DIR):
-    for root, dirs, files in os.walk(RASP_DIR):
-        for filename in files:
-            if filename.endswith('.py'):
-                script_path = os.path.join(root, filename)
-                scripts.append(script_path)
-    return scripts
+

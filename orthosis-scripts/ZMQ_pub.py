@@ -45,5 +45,4 @@ def zmq_publisher(sa_address, labels, stop_flag_add):
 
     time.sleep(0.5)
     socket.send_string("STOP")
-    # time.sleep(0.5)
-    # socket.send_string("STOP")
+

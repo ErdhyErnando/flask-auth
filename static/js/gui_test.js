@@ -21,15 +21,45 @@ let myChart = new Chart(ctx, {
                 ticks: {
                     callback: function (value) {
                         return value.toFixed(1) + 's';
-                    }
-                }
+                    },
+                    stepSize: 1,
+                    maxTicksLimit: 20
+                },
+                grid: {
+                    display: true,
+                    drawOnChartArea: true,
+                    drawTicks: true,
+                    color: 'rgba(0, 0, 0, 0.1)'
+                },
+                min: 20,
+                max: 40
             },
             y: {
                 beginAtZero: true,
                 title: {
                     display: true,
                     text: 'Values'
-                }
+                },
+                ticks: {
+                    stepSize: 1,
+                    maxTicksLimit: 20
+                },
+                grid: {
+                    display: true,
+                    drawOnChartArea: true,
+                    drawTicks: true,
+                    color: 'rgba(0, 0, 0, 0.1)'
+                },
+                min: 20,
+                max: 40
+            }
+        },
+        layout: {
+            padding: {
+                left: 10,
+                right: 25,
+                top: 0,
+                bottom: 0
             }
         }
     }
@@ -159,7 +189,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let currentTime = (Date.now() - startTime) / 1000;
 
-
         // Add a new data point
         // let newIndex = myChart.data.labels.length + 1;
         // myChart.data.labels.push(newIndex);
@@ -182,6 +211,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             }
         });
+
+        // Update x-axis range
+        let xMax = Math.max(20, Math.ceil(currentTime / 20) * 20);
+        myChart.options.scales.x.max = xMax;
+
+        // Update y-axis range
+        let yValues = myChart.data.datasets.flatMap(ds => ds.data.map(d => d.y));
+        let yMax = Math.max(20, Math.ceil(Math.max(...yValues) / 20) * 20);
+        myChart.options.scales.y.max = yMax;
 
         myChart.update();
     });

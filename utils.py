@@ -1,6 +1,8 @@
 import os
 
-RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
+# RASP_DIR = '/home/mhstrake28/OrthosisProject/orthosis_interface' # for hanif's linux
+RASP_DIR = '/home/mhstrake28/flask-auth/orthosis_interface'  # for hanif's linux with sharred array
+# RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
 
 # Param parser for run_script_continuous()
 def split_args(args):

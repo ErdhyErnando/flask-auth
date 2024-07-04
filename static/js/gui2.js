@@ -8,6 +8,8 @@ let myChart = new Chart(ctx, {
         datasets: []
     },
     options: {
+        animation: false,
+        responsive: true,
         scales: {
             x: {
                 type: 'linear',

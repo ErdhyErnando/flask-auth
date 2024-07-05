@@ -1,4 +1,5 @@
 /*1. Hero Section */
+
 .hero {
   display: flex;
   justify-content: center;
@@ -69,6 +70,7 @@
 }
 
 /* 2. Unautheniticated Login */
+
 .hero__login {
   /* border: 2px solid red; */
   display: flex;
@@ -124,6 +126,8 @@
   color: #f8f8f8;
   border: 1.5px solid #ffffff;
 }
+
+/* 3. Media Queries */
 
 @media screen and (min-width: 342px) {
 

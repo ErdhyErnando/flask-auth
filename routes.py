@@ -3,6 +3,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from models import User, ScriptLabels
 from flask_socketio import emit
 import os
+import json
 import subprocess
 import threading
 import zmq
@@ -11,11 +12,10 @@ import select
 
 from werkzeug.utils import secure_filename
 
-
 # RASP_DIR = '/home/mhstrake28/OrthosisProject/orthosis_interface' # for hanif's linux
 # RASP_DIR = '/home/mhstrake28/flask-auth/orthosis_interface'  # for hanif's linux with sharred array
-# RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
-RASP_DIR = '/home/pi/OrthosisProject/orthosis_interface'  # for orthosis_interface outside raspberry pi
+RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
+# RASP_DIR = '/home/pi/OrthosisProject/orthosis_interface'  # for orthosis_interface outside raspberry pi
 
 # Param parser for run_script_continuous()
 def split_args(args):
@@ -180,6 +180,29 @@ def register_routes(app, db, bcrypt, socketio):
     def internal_server_error(e):
         return render_template('500.html'), 500
 
+    # Get File Structure
+    @app.route('/get_file_structure')
+    def get_file_structure():
+        file_structure = generate_file_structure(RASP_DIR)  
+        return jsonify(file_structure)
+
+    def generate_file_structure(path):
+        structure = []
+        for item in os.listdir(path):
+            item_path = os.path.join(path, item)
+            if os.path.isdir(item_path):
+                structure.append({
+                    'name': item,
+                    'type': 'folder',
+                    'children': generate_file_structure(item_path)
+                })
+            else:
+                structure.append({
+                    'name': item,
+                    'type': 'file'
+                })
+        return structure
+
 
     # Script upload and GUI routes
     @app.route('/uploadfile', methods=['GET', 'POST'])
@@ -229,8 +252,9 @@ def register_routes(app, db, bcrypt, socketio):
         for label_entry in labels_query:
             labels_data[label_entry.script_name] = label_entry.Labels.split(',')
         
-        scripts = get_scripts()
+        # Instead of get_scripts(), we'll use the file structure
+        file_structure = generate_file_structure(RASP_DIR)
 
-        return render_template('gui3.html', scripts=scripts, labels_data=labels_data)  
+        return render_template('gui3.html', file_structure=file_structure, labels_data=labels_data)
 
 

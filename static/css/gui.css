@@ -68,7 +68,7 @@ input[type="file"] {
   display: none;
 }
 
-label {
+label.gui__filelabel {
   display: inline-block;
   padding: 15px 25px;
 }
@@ -357,4 +357,30 @@ input.param-input::placeholder {
   cursor: pointer;
   background-color: rgb(158, 158, 149);
   border-radius: 40px;
+}
+
+.label-filters {
+  justify-content: center;
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+label {
+  padding: 2px 4px;
+}
+
+.label-filter {
+  display: flex;
+  align-items: center;
+  padding: 2px 4px;
+}
+
+@media screen and (max-width: 560px) {
+  .label-filters {
+    font-size: 9px;
+  }
 }

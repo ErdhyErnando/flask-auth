@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fileExplorerModal.style.display = 'block';
     });
 
-    // Close File explorer
+    // Close File explorer modal
     let closeButtons = document.getElementsByClassName('close');
     for (let i = 0; i < closeButtons.length; i++) {
         closeButtons[i].addEventListener('click', function () {
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Create file explorer
+    // Create file explorer modal
     function createFileExplorer(structure, parentElement, path = '/home/pi/flask-auth/orthosis-scripts/') {
         structure.forEach(item => {
             let itemElement = document.createElement('div');
@@ -130,6 +130,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+
     // Modal for confirmation
     let startButton = document.getElementById("startButton");
     let stopButton = document.getElementById("stopButton");
@@ -178,6 +179,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.getElementById("output").textContent = ""; // Clear output area
 
+        // Clear label filters
+        document.getElementById('labelFilters').innerHTML = '';
+        labelFilters = {};
+
         startTime = null;
         myChart.data.datasets = [];
         myChart.update();
@@ -206,6 +211,42 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("output").textContent += "Script stopped by user\n";
     });
 
+    let labelFilters = {};
+    // Function to create or update Label filters
+    function updateLabelFilter(labels) {
+        const filterContainer = document.getElementById('labelFilters');
+
+        labels.forEach(label => {
+            if (!labelFilters.hasOwnProperty(label)) {
+                const filterDiv = document.createElement('div');
+                filterDiv.className = 'label-filter';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `filter-${label}`;
+                checkbox.checked = true;
+
+                const labelElement = document.createElement('label');
+                labelElement.htmlFor = `filter-${label}`;
+                labelElement.textContent = label;
+
+                filterDiv.appendChild(checkbox);
+                filterDiv.appendChild(labelElement);
+                filterContainer.appendChild(filterDiv);
+
+                labelFilters[label] = checkbox;
+
+                checkbox.addEventListener('change', function () {
+                    const dataset = myChart.data.datasets.find(ds => ds.label === label);
+                    if (dataset) {
+                        dataset.hidden = !checkbox.checked;
+                        myChart.update();
+                    }
+                });
+            }
+        });
+    }
+
 
     // Handle script output (combining both scripts)
     let startTime = null;
@@ -225,11 +266,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let currentTime = (Date.now() - startTime) / 1000;
 
-        // Update or add datasets
+        // Update or add datasets; change with datalabel filters
         labels.forEach((label, index) => {
             let dataset = myChart.data.datasets.find(ds => ds.label === label);
             if (dataset) {
-                //dataset.data.push(values[index]);
                 dataset.data.push({ x: currentTime, y: values[index] });
             } else {
                 let color = `rgb(${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})`;
@@ -239,11 +279,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     backgroundColor: color,
                     borderColor: color,
                     borderWidth: 1,
-                    fill: false
+                    fill: false,
+                    hidden: labelFilters[label] ? !labelFilterts[label].checked : false
                 });
             }
         });
 
+        updateLabelFilter(labels);
         myChart.update();
     });
 

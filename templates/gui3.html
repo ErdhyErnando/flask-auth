@@ -34,25 +34,19 @@
         </div>
     </section>
 
+    <!-- Label filters -->
+    <div id="labelFilters" class="label-filters"></div>
+
     <!-- Choose File and Parameter -->
     <section class="gui__fileandparam">
-        <!-- <div class="gui__file">
-            <label for="scriptSelect" id="hiddenFileInput" class="gui__filelabel">Choose Files</label>
-            <div class="gui__selectwrapper">
-                <select name="script" id="scriptSelector">
-                    {% for script in scripts %}
-                    <option value="{{ script }}">{{ script }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div> -->
 
+        <!-- Choose File to show file explorer modal -->
         <div class="gui__file">
             <label id="chooseFileLabel" class="gui__filelabel">Choose File</label>
             <span id="selectedFileDisplay"></span>
         </div>
 
-        <!-- File Explorer Modal -->
+        <!-- File explorer modal -->
         <div id="fileExplorerModal" class="feModal">
             <div class="fe-modal-content">
                 <span class="close">&times;</span>
@@ -61,6 +55,7 @@
             </div>
         </div>
 
+        <!-- Dynamic param field-->
         <div class="gui__param">
             <input type="text" id="param1" class="param-input" name="param1" placeholder="Param 1">
             <input type="text" id="param2" class="param-input" name="param2" placeholder="Param 2">
@@ -78,7 +73,7 @@
         </div>
     </section>
 
-    <!-- Modal -->
+    <!-- Confirmation modal -->
     <div id="commandModal" class="modal">
         <div class="modal-content">
             <span class="closeModal">&times;</span>

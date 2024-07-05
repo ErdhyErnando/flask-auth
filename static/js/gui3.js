@@ -80,7 +80,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     console.log(path + item.name);
                 });
             } else {
-                itemElement.innerHTML = `<span class="file-icon">📄</span> ${item.name}`;
+                // check if it is a .py file
+                let fileIcon = item.name.endsWith('.py') ? '<span class="file-icon">🐍</span>' : '<span class="file-icon">📄</span>';
+
+                itemElement.innerHTML = `${fileIcon} ${item.name}`;
                 itemElement.classList.add('file');
                 itemElement.addEventListener('click', function (e) {
                     e.stopPropagation();

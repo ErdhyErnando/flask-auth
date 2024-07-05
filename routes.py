@@ -8,7 +8,9 @@ import subprocess
 import threading
 import zmq
 import time
+
 import select
+import signal
 
 from werkzeug.utils import secure_filename
 
@@ -42,61 +44,55 @@ def get_scripts():
                 scripts.append(script_path)
     return scripts
 
+# All Flask & SocketIO routes
 def register_routes(app, db, bcrypt, socketio):
     global running_thread, stop_thread
     running_thread = None
     stop_thread = False 
 
-    # SocketIO
+    # Function to run the script; zmq, socketio, subprocess
     def run_script_continuous(script_name, params):
         global stop_thread, process
         stop_thread = False
 
         try:
             port = "5001"
-            # Creates a socket instance
             context = zmq.Context()
             socket = context.socket(zmq.SUB)
-            # Connects to a bound socket
             socket.connect(f"tcp://localhost:{port}")
-            # Subscribes to all topics
             socket.subscribe("")
+            socket.setsockopt(zmq.RCVTIMEO, 100)
             listPar = split_args(list(params.values()))
             cleanListPar = remove_empty_array(listPar)
             print(listPar)
 
-            process = subprocess.Popen(['python3', script_name] + cleanListPar)
-            while True:
-                if stop_thread:
-                    process.terminate()
-                    break
-
-                output = socket.recv_string()
-                if output != "STOP":
-                    output_with_breaks = output + '\n'
-                    socketio.emit('script_output', {'output': output_with_breaks}, namespace='/')
-                else:
-                    print('stop marker received')
-                    socketio.emit('script_output', {'output': 'Script finished'}, namespace='/')
-                    break
-            #time.sleep(0.1)
-
+            process = subprocess.Popen(['python3', script_name] + cleanListPar, preexec_fn=os.setsid)
+            while not stop_thread:
+                try:
+                    output = socket.recv_string()
+                    if output != "STOP":
+                        output_with_breaks = output + '\n'
+                        socketio.emit('script_output', {'output': output_with_breaks}, namespace='/')
+                    else :
+                        print('stop marker received')
+                        socketio.emit('script_output', {'output': 'Script finished'}, namespace='/')
+                        break
+                except zmq.Again:       
+                    # Timeout occured, just continue the loop
+                    continue
+            if stop_thread:
+                os.killpg(os.getpgid(process.pid), signal.SIGINT)
         except Exception as e:
             socketio.emit('script_output', {'output': str(e)}, namespace='/')
         finally:
             if process:
-                process.terminate()
-            process = None
-
-    def terminate_subprocess():
-        global process
-        if process:
-            process.terminate()
-            try:
-                process.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                process.kill()
-            process = None
+                try:
+                   os.killpg(os.getpgid(process.pid), signal.SIGINT)
+                   process.wait(timeout=5)
+                except:
+                    os.killpg(os.getpgid(process.pid), signal.SIGKILL)
+            process = None          
+                 
 
     # SocketIO start and stop script
     @socketio.on('start_script')
@@ -112,14 +108,16 @@ def register_routes(app, db, bcrypt, socketio):
 
     @socketio.on('stop_script')
     def stop_script():
-        global stop_thread, running_thread
+        global stop_thread, running_thread, process
         stop_thread = True
         if running_thread and running_thread.is_alive():
             running_thread.join(timeout=5)
-            if running_thread.is_alive():
-
-                # If the thread is still alive, we need to force terminate the subprocess
-                terminate_subprocess()
+        if process:
+            try:
+                os.killpg(os.getpgid(process.pid), signal.SIGINT)
+                process.wait(timeout=5)
+            except:
+                os.killpg(os.getpgid(process.pid), signal.SIGKILL)
         emit('script_output', {'output': 'Script stopped.'}, namespace='/')
 
 
@@ -162,13 +160,7 @@ def register_routes(app, db, bcrypt, socketio):
     @app.route('/logout')
     def logout():
         logout_user()
-        return redirect(url_for('index'))
-
-    @app.route('/logout_on_close', methods=['POST'])
-    @login_required
-    def logout_on_close():
-        logout_user()
-        return '', 204     
+        return redirect(url_for('index'))   
 
 
     # Error Pages
@@ -204,7 +196,7 @@ def register_routes(app, db, bcrypt, socketio):
         return structure
 
 
-    # Script upload and GUI routes
+    # File upload and GUI routes
     @app.route('/uploadfile', methods=['GET', 'POST'])
     def uploadfile(): 
         if request.method == 'POST':

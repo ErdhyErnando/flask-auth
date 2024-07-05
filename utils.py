@@ -14,6 +14,10 @@ def split_args(args):
             split_args.append(arg)
     return split_args
 
+# Remove empty array in args
+def remove_empty_array(arr):
+    return [item for item in arr if item]
+
 # Function to get the scripts in the scripts directory
 def get_scripts():
     scripts = []

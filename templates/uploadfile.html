@@ -38,7 +38,8 @@
             <div class="uploadfile__upload">
                 <label for="file">Attach File</label>
                 <div class="uploadfile__uploadtext">
-                    <input type="file" id="hiddenFileInput" name="file" class="uploadfile__fileinput" required>
+                    <input type="file" id="hiddenFileInput" name="file" class="uploadfile__fileinput" accept=".py"
+                        required>
                     <p>Click here to select a file</p>
                 </div>
             </div>
@@ -66,6 +67,10 @@
             document.getElementById('hiddenFileInput').click();
         });
 
+
+        // Regex for python file
+        const isPythonFile = (filename) => { return /\.py$/.test(filename); }
+
         document.getElementById('uploadForm').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -73,6 +78,17 @@
             let outputLabel = document.getElementById('outputLabel').value;
             let fileInput = document.getElementById('hiddenFileInput');
             let file = fileInput.files[0];
+
+            if (file) {
+                if (!isPythonFile(file.name)) {
+                    alert('Please upload a Python file (.py) only');
+                    return;
+                }
+            } else {
+                alert('Please select a file to upload');
+                return;
+            }
+
             let formData = new FormData();
             formData.append('title', title);
             formData.append('outputLabel', outputLabel);

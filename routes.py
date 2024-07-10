@@ -18,7 +18,7 @@ from utils import split_args, remove_empty_array, get_scripts
 
 # RASP_DIR = '/home/mhstrake28/OrthosisProject/orthosis_interface' # for hanif's linux
 # RASP_DIR = '/home/mhstrake28/flask-auth/orthosis_interface'  # for hanif's linux with sharred array
-#RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
+# RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
 RASP_DIR = '/home/pi/OrthosisProject/orthosis_interface'  # for orthosis_interface outside raspberry pi
 
 
@@ -55,21 +55,14 @@ def register_routes(app, db, bcrypt, socketio):
                         print('stop marker received')
                         socketio.emit('script_output', {'output': 'Script finished'}, namespace='/')
                         break
+                    print(stop_thread)
                 except zmq.Again:       
                     # Timeout occured, just continue the loop
                     continue
             if stop_thread:
                 os.killpg(os.getpgid(process.pid), signal.SIGINT)
         except Exception as e:
-            socketio.emit('script_output', {'output': str(e)}, namespace='/')
-        finally:
-            if process:
-                try:
-                   os.killpg(os.getpgid(process.pid), signal.SIGINT)
-                   process.wait(timeout=5)
-                except:
-                    os.killpg(os.getpgid(process.pid), signal.SIGKILL)
-            process = None          
+            socketio.emit('script_output', {'output': str(e)}, namespace='/')         
                  
 
     # SocketIO start and stop script

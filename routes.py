@@ -18,8 +18,8 @@ from utils import split_args, remove_empty_array, get_scripts
 
 # RASP_DIR = '/home/mhstrake28/OrthosisProject/orthosis_interface' # for hanif's linux
 # RASP_DIR = '/home/mhstrake28/flask-auth/orthosis_interface'  # for hanif's linux with sharred array
-RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
-# RASP_DIR = '/home/pi/OrthosisProject/orthosis_interface'  # for orthosis_interface outside raspberry pi
+#RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
+RASP_DIR = '/home/pi/OrthosisProject/orthosis_interface'  # for orthosis_interface outside raspberry pi
 
 
 # All Flask & SocketIO routes
@@ -154,7 +154,10 @@ def register_routes(app, db, bcrypt, socketio):
     @app.route('/get_file_structure')
     def get_file_structure():
         file_structure = generate_file_structure(RASP_DIR)  
-        return jsonify(file_structure)
+        return jsonify({
+            'structure': file_structure,
+            'base_path': RASP_DIR
+        })
 
     def generate_file_structure(path):
         structure = []

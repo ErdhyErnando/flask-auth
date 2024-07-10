@@ -59,8 +59,18 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+
+    // Fetch file structure from server
+    fetch('/get_file_structure')
+        .then(response => response.json())
+        .then(data => {
+            basePath = data.base_path;
+            createFileExplorer(data.structure, fileExplorer, basePath);
+        });
+
+
     // Create file explorer modal
-    function createFileExplorer(structure, parentElement, path = '/home/pi/flask-auth/orthosis-scripts/') {
+    function createFileExplorer(structure, parentElement, path = basePath) {
         structure.forEach(item => {
             let itemElement = document.createElement('div');
             itemElement.classList.add('file-explorer-item');
@@ -71,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 let childrenContainer = document.createElement('div');
                 childrenContainer.classList.add('folder-children');
                 childrenContainer.style.display = 'none';
-                createFileExplorer(item.children, childrenContainer, path + item.name + '/');
+                createFileExplorer(item.children, childrenContainer, path + '/' + item.name);
                 itemElement.appendChild(childrenContainer);
 
                 itemElement.addEventListener('click', function (e) {
@@ -80,6 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     console.log(path + item.name);
                 });
             } else {
+
                 // check if it is a .py file
                 let fileIcon = item.name.endsWith('.py') ? '<span class="file-icon">🐍</span>' : '<span class="file-icon">📄</span>';
 
@@ -87,23 +98,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 itemElement.classList.add('file');
                 itemElement.addEventListener('click', function (e) {
                     e.stopPropagation();
-                    selectedFile = path + item.name;
+                    selectedFile = path + '/' + item.name;
                     selectedFileDisplay.textContent = item.name;
                     fileExplorerModal.style.display = 'none';
-                    // document.getElementById('hiddenFileInput').textContent = selectedFile;
                 });
             }
 
             parentElement.appendChild(itemElement);
         });
     }
-
-    // Fetch file structure from server
-    fetch('/get_file_structure')
-        .then(response => response.json())
-        .then(data => {
-            createFileExplorer(data, fileExplorer);
-        });
 
 
     // Handle file selection

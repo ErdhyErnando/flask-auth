@@ -351,7 +351,18 @@ input.param-input::placeholder {
   margin-right: 16px;
   font-weight: 500;
   font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
 }
+
+#chooseFileLabel {
+  background-color: rgb(195, 195, 190);
+  border-radius: 40px;
+  padding: 10px 20px;
+}
+
 
 #chooseFileLabel:hover {
   cursor: pointer;
@@ -382,5 +393,16 @@ label {
 @media screen and (max-width: 560px) {
   .label-filters {
     font-size: 9px;
+  }
+
+}
+
+@media screen and (max-width: 360px) {
+  #selectedFileDisplay {
+    font-size: 9px;
+  }
+
+  label {
+    font-size: 10px;
   }
 }

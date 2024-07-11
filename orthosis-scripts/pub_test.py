@@ -20,7 +20,7 @@ def increment():
 
 
 def run_publsiher():
-    zmq_publisher(["shm://test1","shm://test2"],"shm://stop")
+    zmq_publisher(["shm://test1","shm://test2"],["data1","data2"],"shm://stop")
 
     
 

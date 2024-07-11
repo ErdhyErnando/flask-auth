@@ -260,8 +260,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Split and parse data output
         let parts = data.output.trim().split(":");
-        let labels = parts.filter((part, index) => index % 2 === 0).map(label => label.trim()); // Extract labels
-        let values = parts.filter((part, index) => index % 2 !== 0).map(value => Number(value.trim()));
+        let labels = [];
+        let values = [];
+
+        for (let i = 0; i < parts.length - 1; i += 2) {
+            labels.push(parts[i].trim());
+            values.push(Number(parts[i + 1].trim()));
+        }
+
+        // let labels = parts.filter((part, index) => index % 2 === 0).map(label => label.trim()); // Extract labels
+        // let values = parts.filter((part, index) => index % 2 !== 0).map(value => Number(value.trim()));
 
         if (startTime === null) {
             startTime = Date.now();

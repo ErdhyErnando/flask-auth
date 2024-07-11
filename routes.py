@@ -18,8 +18,8 @@ from utils import split_args, remove_empty_array, get_scripts
 
 # RASP_DIR = '/home/mhstrake28/OrthosisProject/orthosis_interface' # for hanif's linux
 # RASP_DIR = '/home/mhstrake28/flask-auth/orthosis_interface'  # for hanif's linux with sharred array
-# RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
-RASP_DIR = '/home/pi/OrthosisProject/orthosis_interface'  # for orthosis_interface outside raspberry pi
+RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
+# RASP_DIR = '/home/pi/OrthosisProject/orthosis_interface'  # for orthosis_interface outside raspberry pi
 
 
 # All Flask & SocketIO routes

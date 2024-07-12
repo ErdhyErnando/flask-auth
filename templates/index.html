@@ -24,32 +24,32 @@
     <main class="hero">
         <div class="hero__container">
 
-            <a href="https://192.168.178.48:4200" target="_blank">
+            <!-- !ALWAYS CHANGE ACCORDING TO DEVICE'S IP-->
+            <a href="https://192.168.122.1:4200" target="_blank">
+                <!-- <a href="https://192.168.122.112:4200" target="_blank"> -->
                 <div class="hero__clicontainer">
                     <div class="cli__image">
                         <img src="/static/images/cli_interface_3.jpg" alt="cli" class="cli mode pic">
                     </div>
                     <h3>CLI Mode</h3>
-                    <p>lorem ipsum dolor sit amet</p>
-                    <p>Omnis magnam ad magni est</p>
+                    <p>Command-line interface for script execution.</p>
+                    <p></p>
                 </div>
             </a>
 
-            <!-- TODO: change lorem ipsum text-->
             <a href="{{ url_for('gui') }}">
                 <div class="hero__guicontainer">
                     <div class="gui__image">
-                        <img src="/static/images/gui_interface.jpg" alt="gui" class="gui mode pic">
+                        <img src="/static/images/gui_interface.jpeg" alt="gui" class="gui mode pic">
                     </div>
                     <h3>GUI Mode</h3>
-                    <p>lorem ipsum dolor sit amet</p>
-                    <p>Omnis magnam ad magni est</p>
+                    <p>Run scripts and see result with simple clicks</p>
                 </div>
             </a>
         </div>
     </main>
 
-    <!--Upload-->
+    <!--Upload New File Page-->
     <section class="upload">
         <div class="upload__container">
             <a href="{{ url_for('uploadfile') }}" class="upload_button">Upload New File</a>

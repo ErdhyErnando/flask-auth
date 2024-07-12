@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block title %} Upload New File {% endblock %}
 
-
 {% block content %}
 {% if current_user.is_authenticated %}
 
@@ -14,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,
-    wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
+    wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/styles.css">
     <link rel="stylesheet" href="/static/css/uploadfile.css">
     <link rel="stylesheet" href="/static/css/utils.css">
@@ -23,75 +22,121 @@
 
 <body>
 
-    <!-- Uplaod File Section-->
+    <!-- Upload File Section-->
     <main class="uploadfile__container">
         <div class="uploadfile__header">
             <h2>Add New File</h2>
         </div>
 
-        <form action="{{ url_for('uploadfile') }}" method="post" enctype="multipart/form-data">
+        <form id="uploadForm" action="/uploadfile" method="post" enctype="multipart/form-data">
             <div class="uploadfile__title">
-                <label for="text">Title</label>
-                <input type="text" id="title" name="title">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" required>
             </div>
 
-            <div class="uploadfile__upload">
-                <label for="text">Attach File</label>
 
-                <!--input the file-->
+            <div class="uploadfile__upload">
+                <label for="file">Attach File</label>
                 <div class="uploadfile__uploadtext">
-                    <input type="file" id="hiddenFileInput" name="file" class="uploadfile__fileinput">
-                    <p>click here to select a file</p>
+                    <input type="file" id="hiddenFileInput" name="file" class="uploadfile__fileinput" accept=".py"
+                        required>
+                    <p>Click here to select a file</p>
                 </div>
+            </div>
+
+            <div class="uploadfile__label">
+                <label for="outputLabel">Output Label ("output1, output2")</label>
+                <input type="text" id="outputLabel" name="outputLabel" required>
             </div>
 
             <div class="uploadfile__progress">
                 <progress id="fileUploadProgress" value="0" max="100"></progress>
+                <div id="progress-label">0%</div>
             </div>
+
+            <div id="feedback"></div>
 
             <div class="uploadfile__btncontainer">
                 <button type="submit" class="uploadfile__button">Upload</button>
             </div>
         </form>
     </main>
-</body>
 
-<script>
-    document.querySelector('.uploadfile__uploadtext').addEventListener('click', function () {
-        document.getElementById('hiddenFileInput').click();
-    });
+    <script>
+        document.querySelector('.uploadfile__uploadtext').addEventListener('click', function () {
+            document.getElementById('hiddenFileInput').click();
+        });
 
-    document.querySelector('form').addEventListener('submit', function (event) {
-        event.preventDefault();
 
-        var title = document.getElementById('title').value;
-        var fileInput = document.getElementById('hiddenFileInput');
-        var file = fileInput.files[0];
-        var formData = new FormData();
-        formData.append('title', title);
-        formData.append('file', file);
+        // Regex for python file
+        const isPythonFile = (filename) => { return /\.py$/.test(filename); }
 
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '{{ url_for('uploadfile') }}', true);
+        document.getElementById('uploadForm').addEventListener('submit', function (event) {
+            event.preventDefault();
 
-        xhr.upload.onprogress = function (event) {
-            if (event.lengthComputable) {
-                var percentComplete = (event.loaded / event.total) * 100;
-                document.getElementById('fileUploadProgress').value = percentComplete;
-            }
-        };
+            let title = document.getElementById('title').value;
+            let outputLabel = document.getElementById('outputLabel').value;
+            let fileInput = document.getElementById('hiddenFileInput');
+            let file = fileInput.files[0];
 
-        xhr.onload = function () {
-            if (xhr.status == 200) {
-                alert('File uploaded successfully');
+            if (file) {
+                if (!isPythonFile(file.name)) {
+                    alert('Please upload a Python file (.py) only');
+                    return;
+                }
             } else {
-                alert('File upload failed');
+                alert('Please select a file to upload');
+                return;
             }
-        };
 
-        xhr.send(formData);
-    });
-</script>
+            let formData = new FormData();
+            formData.append('title', title);
+            formData.append('outputLabel', outputLabel);
+            formData.append('file', file);
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', '{{ url_for("uploadfile") }}', true);
+
+            xhr.upload.onprogress = function (event) {
+                if (event.lengthComputable) {
+                    let percentComplete = (event.loaded / event.total) * 100;
+                    document.getElementById('fileUploadProgress').value = percentComplete;
+                    document.getElementById('progress-label').innerHTML = Math.round(percentComplete) + "%";
+                }
+            };
+
+            // Show upload progress and feedback
+            xhr.onload = function () {
+                if (xhr.status == 200) {
+                    document.getElementById('feedback').innerHTML = '<span>File <u>' + file.name + '</u> has been uploaded successfully.</span>';
+                } else {
+                    document.getElementById('feedback').innerHTML = '<span>Error uploading file <u>' + file.name + '</u>. Please try again.</span>';
+                }
+            };
+
+            xhr.onerror = function () {
+                document.getElementById('feedback').innerHTML = '<span>Error uploading file <u>' + file.name + '</u>. Please try again.</span>';
+            };
+
+            xhr.send(formData);
+        });
+
+
+        // Add file title to the upload text 
+        document.getElementById('hiddenFileInput').addEventListener('change', function () {
+            let filename = this.files[0].name;
+            document.querySelector('.uploadfile__uploadtext p').textContent = filename;
+        });
+
+        // Autiomatically add file title to the title input
+        document.getElementById('hiddenFileInput').addEventListener('change', function () {
+            let filename = this.files[0].name;
+            document.querySelector('.uploadfile__uploadtext p').textContent = filename;
+            document.getElementById('title').value = filename;
+        });
+
+    </script>
+</body>
 
 </html>
 
@@ -103,8 +148,5 @@
     <a href="{{ url_for('login') }}" class="btn btn-dark">Login</a>
 </div>
 
-
 {% endif %}
-
-
 {% endblock %}

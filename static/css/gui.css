@@ -1,4 +1,5 @@
-/*1. Graph and Output*/
+/*1. Graph and Output */
+
 body {
   font-family: "DM Mono", monospace;
   margin: 0;
@@ -16,6 +17,8 @@ body {
   background-color: #f8f8f8;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
   gap: 12.5px;
+  height: 100%;
+
 }
 
 .gui__graph {
@@ -35,7 +38,19 @@ body {
   padding: 7px;
 }
 
-/*2. Choose file and input parameters*/
+#myChart {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#output {
+  max-height: 140px;
+  overflow-y: auto;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+/*2. Choose file and input parameters */
 
 .gui__fileandparam {
   /* border: 2px solid red; */
@@ -60,7 +75,7 @@ input[type="file"] {
   display: none;
 }
 
-label {
+label.gui__filelabel {
   display: inline-block;
   padding: 15px 25px;
 }
@@ -74,7 +89,8 @@ label {
   border-radius: 44px;
   width: 95%;
   padding: 2px;
-  margin: 8px auto; /* Add 'auto' to horizontally center the element */
+  margin: 8px auto;
+  /* Add 'auto' to horizontally center the element */
   background-color: #d9d9d9;
 }
 
@@ -92,7 +108,7 @@ label {
 .gui__selectwrapper:hover {
   cursor: pointer;
   background-color: rgb(116, 116, 109);
-  padding: 8px;
+  padding: 10px;
   border-radius: 4px;
 }
 
@@ -125,10 +141,41 @@ input::placeholder {
   font-family: "DM Mono", monospace;
 }
 
+input.param-input {
+  border-radius: 10px;
+  width: 100%;
+  padding: 10px 10px;
+  margin: 5px 0px;
+}
+
+input.param-input::placeholder {
+  font-family: "DM Mono", monospace;
+}
+
+.add-param-button {
+  border-radius: 10px;
+  font-family: DM Mono, monospace;
+  padding: 8px 10px;
+  margin: 5px 0px;
+  background-color: #007bff;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.add-param-button:hover {
+  background-color: #0056b3;
+  color: #ffffff;
+  border: 2px solid #f8f8f8;
+}
+
+
 .gui__btnwrapper {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 10px;
 }
 
 .gui__runbutton {
@@ -148,4 +195,232 @@ input::placeholder {
   background-color: #31df62;
   color: #000000;
   border: 2px solid #f8f8f8;
+}
+
+.gui__stopbutton {
+  border-radius: 10px;
+  font-family: DM Mono, monospace;
+  width: 25%;
+  padding: 8px 10px;
+  margin: 5px 0px;
+  background-color: #ff3333;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.gui__stopbutton:hover {
+  background-color: #df3131;
+  color: #000000;
+  border: 2px solid #f8f8f8;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#modalMessage {
+  font-weight: bold;
+  color: #df3131;
+  font-size: 20px;
+  text-align: center;
+}
+
+#commandText {
+  font-style: italic;
+  font-size: 12px;
+}
+
+#confirmButton {
+  margin-top: 20px;
+}
+
+#confirmButton:hover {
+  background-color: #31df62;
+  color: #000000;
+  border: 2px solid #f8f8f8;
+}
+
+/* 3. for file explorer*/
+
+.file-explorer {
+  border: 1px solid #ccc;
+  padding: 10px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.file-explorer-item {
+  cursor: pointer;
+  padding: 5px;
+}
+
+.file-explorer-item:hover {
+  background-color: #f0f0f0;
+}
+
+.folder-children {
+  margin-left: 16px;
+}
+
+.folder-icon,
+.file-icon {
+  margin-right: 5px;
+}
+
+.feModal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.fe-modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 600px;
+}
+
+.closeModal {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.closeModal:hover,
+.closeModal:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#fileExplorer {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.gui_filelabel {
+  cursor: pointer;
+}
+
+.file-explorer-item {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.file-explorer-item:hover {
+  background-color: #f0f0f0;
+}
+
+#selectedFileDisplay {
+  margin-right: 16px;
+  font-weight: 500;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+#chooseFileLabel {
+  background-color: rgb(195, 195, 190);
+  border-radius: 40px;
+  padding: 10px 20px;
+}
+
+
+#chooseFileLabel:hover {
+  cursor: pointer;
+  background-color: rgb(158, 158, 149);
+  border-radius: 40px;
+}
+
+.label-filters {
+  justify-content: center;
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+label {
+  padding: 2px 4px;
+}
+
+.label-filter {
+  display: flex;
+  align-items: center;
+  padding: 2px 4px;
+}
+
+@media (max-width: 768px) {
+  .label-filter {
+    font-size: 12px;
+  }
+
+  .label-filter input[type="checkbox"] {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+@media screen and (max-width: 560px) {
+  .label-filters {
+    font-size: 9px;
+  }
+
+}
+
+@media screen and (max-width: 360px) {
+  #selectedFileDisplay {
+    font-size: 9px;
+  }
+
+  label {
+    font-size: 10px;
+  }
 }

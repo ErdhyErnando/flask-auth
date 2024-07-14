@@ -16,6 +16,9 @@ from werkzeug.utils import secure_filename
 
 from utils import split_args, remove_empty_array, get_scripts
 
+import csv
+from datetime import datetime, timedelta
+
 # RASP_DIR = '/home/mhstrake28/OrthosisProject/orthosis_interface' # for hanif's linux
 # RASP_DIR = '/home/mhstrake28/flask-auth/orthosis_interface'  # for hanif's linux with sharred array
 RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
@@ -90,6 +93,51 @@ def register_routes(app, db, bcrypt, socketio):
             except:
                 os.killpg(os.getpgid(process.pid), signal.SIGKILL)
         emit('script_output', {'output': 'Script stopped.'}, namespace='/')
+
+    
+    # data logging
+    @socketio.on('log_data')
+    def log_data(data):
+        print("Received log data: ", data)
+        log_dir = os.path.join(RASP_DIR, 'logs')
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        script_name = os.path.splitext(os.path.basename(data['filename']))[0]
+        log_filename = f"{script_name}_log_{timestamp}.txt"
+        log_path = os.path.join(log_dir, log_filename)
+
+        try:
+            with open(log_path, 'w') as f:
+                # Get all unique timestamps
+                all_timestamps = set()
+                for label, points in data['data'].items():
+                    all_timestamps.update(point['x'] for point in points)
+                
+                # Sort timestamps
+                sorted_timestamps = sorted(all_timestamps)
+                
+                for timestamp in sorted_timestamps:
+                    # Convert timestamp to time format
+                    time_str = str(timedelta(seconds=int(timestamp)))
+                    
+                    # Collect data for this timestamp
+                    data_points = []
+                    for label, points in data['data'].items():
+                        point = next((p for p in points if p['x'] == timestamp), None)
+                        if point:
+                            data_points.append(f"{label}:{point['y']:.1f}")
+                    
+                    # Write the line
+                    line = f"time: {time_str} " + ":".join(data_points) + "\n"
+                    f.write(line)
+
+            print(f"Log file created: {log_path}")
+            emit('logging_complete', {'message': f'Data logged to {log_filename}'})
+        except Exception as e:
+            print(f"Error during logging: {str(e)}")
+            emit('logging_complete', {'message': f'Error during logging: {str(e)}'})
 
 
     # Page routes

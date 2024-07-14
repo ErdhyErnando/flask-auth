@@ -46,6 +46,10 @@ document.addEventListener("DOMContentLoaded", function () {
     let chooseFileLabel = document.getElementById('chooseFileLabel');
     let selectedFileDisplay = document.getElementById('selectedFileDisplay');
 
+    // log button
+    let logButton = document.getElementById('logButton');
+
+
     // Open file explorer modal when "Choose Files" is clicked
     chooseFileLabel.addEventListener('click', function () {
         fileExplorerModal.style.display = 'block';
@@ -143,6 +147,30 @@ document.addEventListener("DOMContentLoaded", function () {
     let commandText = document.getElementById("commandText");
 
 
+    // Handle logging
+    function logData() {
+        let selectedLabels = Object.keys(labelFilters).filter(label => labelFilters[label].checked);
+        let dataToLog = {};
+        selectedLabels.forEach(label => {
+            let dataset = myChart.data.datasets.find(ds => ds.label === label);
+            if (dataset) {
+                dataToLog[label] = dataset.data;
+            }
+        });
+        console.log("Data to log", dataToLog);
+        socket.emit("log_data", { data: dataToLog, filename: selectedFile });
+    }
+
+    logButton.addEventListener('click', logData);
+
+    // socket for logging data
+    socket.on("logging_complete", function (data) {
+        console.log("logging complete", data.message);
+        alert(data.message)
+    });
+
+
+
     // Handle start button click
     startButton.addEventListener("click", function (event) {
         event.preventDefault();
@@ -167,6 +195,8 @@ document.addEventListener("DOMContentLoaded", function () {
         let command = `python3 ${filename} ${paramStr}`;
         commandText.textContent = command;
         modal.style.display = "block";
+
+        //logButton.disabled = true;
     });
 
 
@@ -206,6 +236,8 @@ document.addEventListener("DOMContentLoaded", function () {
         startTime = null;
         myChart.data.datasets = [];
         myChart.update();
+
+        //logButton.disabled = false;
     });
 
 
@@ -299,6 +331,7 @@ document.addEventListener("DOMContentLoaded", function () {
         updateLabelFilter(labels);
         myChart.update();
     });
+
 
 
     // Close confirmation modal

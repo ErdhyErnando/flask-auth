@@ -219,15 +219,22 @@ def register_routes(app, db, bcrypt, socketio):
 
 
     # File upload and GUI routes
+    @app.route('/get_folders')
+    def get_folders():
+        folders = [f for f in os.listdir(RASP_DIR) if os.path.isdir(os.path.join(RASP_DIR, f))]
+        return jsonify({'folders': folders})
+
     @app.route('/uploadfile', methods=['GET', 'POST'])
     def uploadfile(): 
         if request.method == 'POST':
+            print("Form Data: ", request.form)
             file = request.files['file']
             title = request.form['title']
             output_label = request.form['outputLabel']
+            selected_folder = request.form['folder']
 
             if file and file.filename.endswith('.py'):
-                folder_path = RASP_DIR
+                folder_path = os.path.join(RASP_DIR, selected_folder)
                 if not os.path.exists(folder_path):
                     os.makedirs(folder_path)
                 file_path = os.path.join(folder_path, file.filename)
@@ -247,6 +254,8 @@ def register_routes(app, db, bcrypt, socketio):
             else:
                 flash('Please select a valid python file', 'error')
         return render_template('uploadfile.html')
+
+        
 
     @app.route('/gui', methods=['GET', 'POST'])
     def gui():

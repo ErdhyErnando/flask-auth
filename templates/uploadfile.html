@@ -28,7 +28,7 @@
             <h2>Add New File</h2>
         </div>
 
-        <form id="uploadForm" action="/uploadfile" method="post" enctype="multipart/form-data">
+        <form id="uploadForm" action="{{ url_for('uploadfile') }}" method="post" enctype="multipart/form-data">
             <div class="uploadfile__title">
                 <label for="title">Title</label>
                 <input type="text" id="title" name="title" required>
@@ -42,6 +42,14 @@
                         required>
                     <p>Click here to select a file</p>
                 </div>
+            </div>
+
+            <!-- Select Folder -->
+            <div class="uploadfile__folder">
+                <label for="folder">Select Folder</label>
+                <select name="folder" id="folder" required>
+
+                </select>
             </div>
 
             <div class="uploadfile__label">
@@ -63,6 +71,20 @@
     </main>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/get_folders')
+                .then(response => response.json())
+                .then(data => {
+                    const folderSelect = document.getElementById('folder');
+                    data.folders.forEach(folder => {
+                        const option = document.createElement('option');
+                        option.value = folder;
+                        option.textContent = folder;
+                        folderSelect.appendChild(option);
+                    });
+                });
+        });
+
         document.querySelector('.uploadfile__uploadtext').addEventListener('click', function () {
             document.getElementById('hiddenFileInput').click();
         });
@@ -79,6 +101,8 @@
             let fileInput = document.getElementById('hiddenFileInput');
             let file = fileInput.files[0];
 
+            let selectedFolder = document.getElementById('folder').value;
+
             if (file) {
                 if (!isPythonFile(file.name)) {
                     alert('Please upload a Python file (.py) only');
@@ -93,6 +117,9 @@
             formData.append('title', title);
             formData.append('outputLabel', outputLabel);
             formData.append('file', file);
+            formData.append('folder', selectedFolder);
+
+
 
             let xhr = new XMLHttpRequest();
             xhr.open('POST', '{{ url_for("uploadfile") }}', true);

@@ -59,6 +59,18 @@
   color: #3e42ce;
 }
 
+.uploadfile__folder {
+  display: flex;
+  justify-content: start;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.uploadfile__folder select {
+  border-radius: 10px;
+  padding: 4px 8px;
+}
+
 .uploadfile__progress {
   display: flex;
   justify-content: center;
@@ -117,4 +129,10 @@
 .uploadfile__button:hover {
   background-color: #3333ff;
   color: #ffe8e8;
+}
+
+@media screen and (max-width: 389px) {
+  .uploadfile__label {
+    font-size: 0.8rem;
+  }
 }

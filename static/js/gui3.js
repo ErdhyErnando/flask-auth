@@ -17,11 +17,17 @@ document.addEventListener("DOMContentLoaded", function () {
                     position: 'bottom',
                     title: {
                         display: true,
-                        text: 'Time (seconds)'
+                        text: 'Time (seconds)',
+                        font: {
+                            size: 10
+                        }
                     },
                     ticks: {
                         callback: function (value) {
                             return value.toFixed(1) + 's';
+                        },
+                        font: {
+                            size: 8
                         }
                     }
                 },
@@ -29,7 +35,24 @@ document.addEventListener("DOMContentLoaded", function () {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Values'
+                        text: 'Values',
+                        font: {
+                            size: 10
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: 8
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        font: {
+                            size: 10
+                        }
                     }
                 }
             }

@@ -11,7 +11,7 @@ body {
   /* border: 2px solid red; */
   display: flex;
   flex-direction: column;
-  margin: 25px 20px;
+  margin: 20px 15px;
   padding: 10px 10px;
   border-radius: 10px;
   background-color: #f8f8f8;
@@ -44,7 +44,7 @@ body {
 }
 
 #output {
-  max-height: 140px;
+  max-height: 80px;
   overflow-y: auto;
   overflow-x: auto;
   white-space: pre-wrap;
@@ -56,7 +56,7 @@ body {
   /* border: 2px solid red; */
   display: flex;
   flex-direction: column;
-  margin: 25px 20px;
+  margin: 20px 15px;
   padding: 10px 10px;
   border-radius: 10px;
   background-color: #f8f8f8;

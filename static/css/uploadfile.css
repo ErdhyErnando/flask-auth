@@ -132,6 +132,10 @@
 }
 
 @media screen and (max-width: 389px) {
+  .uploadfile__uploadtext p {
+    font-size: 0.85rem;
+  }
+
   .uploadfile__label {
     font-size: 0.8rem;
   }

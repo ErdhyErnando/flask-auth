@@ -19,6 +19,8 @@ from utils import split_args, remove_empty_array, get_scripts
 import csv
 from datetime import datetime, timedelta
 
+from sqlalchemy.exc import IntegrityError
+
 # RASP_DIR = '/home/mhstrake28/OrthosisProject/orthosis_interface' # for hanif's linux
 # RASP_DIR = '/home/mhstrake28/flask-auth/orthosis_interface'  # for hanif's linux with sharred array
 RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
@@ -153,11 +155,24 @@ def register_routes(app, db, bcrypt, socketio):
         elif request.method == 'POST':
             username = request.form.get('username')
             password = request.form.get('password')
+
+            # check if username already exists
+            existing_user = User.query.filter_by(username=username).first()
+            if existing_user:
+                flash('Username already exists', 'error')
+                return redirect(url_for('signup'))
+
             hashed_password = bcrypt.generate_password_hash(password)
             user = User(username=username, password=hashed_password, role='user')
-            db.session.add(user)
-            db.session.commit()
-            return redirect(url_for('index'))
+            try:
+                db.session.add(user)
+                db.session.commit()
+                flash('Account created successfully', 'success')
+                return redirect(url_for('index'))
+            except IntegrityError:
+                db.session.rollback()
+                flash('Error creating account', 'error')
+                return redirect(url_for('signup'))
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():

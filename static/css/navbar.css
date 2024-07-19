@@ -40,3 +40,27 @@
 .btn-logout {
   background-color: red;
 }
+
+@media screen and (max-width: 360px) {
+  .nav__container ul li:nth-child(-n + 2) a {
+    font-size: 12px;
+    /* Decrease font size for smaller screens */
+  }
+
+  .nav__container ul li {
+    margin-right: 5px;
+    /* Reduce margin between list items */
+  }
+
+  .nav__container img {
+    width: 24px;
+    /* Optionally decrease logo size */
+  }
+
+  .btn-logout {
+    font-size: 12px;
+    /* Decrease logout button text size */
+    padding: 5px 10px;
+    /* Adjust padding if needed */
+  }
+}

@@ -52,11 +52,6 @@
                 </select>
             </div>
 
-            <div class="uploadfile__label">
-                <label for="outputLabel">Output Label ("output1, output2")</label>
-                <input type="text" id="outputLabel" name="outputLabel" required>
-            </div>
-
             <div class="uploadfile__progress">
                 <progress id="fileUploadProgress" value="0" max="100"></progress>
                 <div id="progress-label">0%</div>
@@ -97,7 +92,7 @@
             event.preventDefault();
 
             let title = document.getElementById('title').value;
-            let outputLabel = document.getElementById('outputLabel').value;
+            //let outputLabel = document.getElementById('outputLabel').value;
             let fileInput = document.getElementById('hiddenFileInput');
             let file = fileInput.files[0];
 
@@ -115,7 +110,7 @@
 
             let formData = new FormData();
             formData.append('title', title);
-            formData.append('outputLabel', outputLabel);
+            //formData.append('outputLabel', outputLabel);
             formData.append('file', file);
             formData.append('folder', selectedFolder);
 

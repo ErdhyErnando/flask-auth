@@ -245,7 +245,7 @@ def register_routes(app, db, bcrypt, socketio):
             print("Form Data: ", request.form)
             file = request.files['file']
             title = request.form['title']
-            output_label = request.form['outputLabel']
+            # output_label = request.form['outputLabel']
             selected_folder = request.form['folder']
 
             if file and file.filename.endswith('.py'):
@@ -258,9 +258,9 @@ def register_routes(app, db, bcrypt, socketio):
                 file.save(file_path)
 
                 # Save the label to db
-                new_label = ScriptLabels(script_name=file.filename, Labels=output_label)
-                db.session.add(new_label)
-                db.session.commit()
+                # new_label = ScriptLabels(script_name=file.filename, Labels=output_label)
+                # db.session.add(new_label)
+                # db.session.commit()
 
                 # Log for debugging
                 print(f"File saved to: {file_path}")

@@ -65,12 +65,15 @@
 
 <link rel="stylesheet" href="/static/css/hero.css">
 
-<div class="hero__login">
-    <h2 class="hero__logintitle">Hello, Please login to continue</h2>
-    <div class="d-grid gap-2">
-        <button class="hero__btn" type="button" onclick="window.location.href='{{ url_for('login') }}'">Login</button>
-        <button class="hero__btnsign" type="button"
-            onclick="window.location.href='{{ url_for('signup') }}'">Signup</button>
+<div class="hero__notauth">
+    <div class="hero__login">
+        <h2 class="hero__logintitle">Hello, please log in to use the app</h2>
+        <div class="d-grid gap-2">
+            <button class="hero__btn" type="button"
+                onclick="window.location.href='{{ url_for('login') }}'">Login</button>
+            <button class="hero__btnsign" type="button"
+                onclick="window.location.href='{{ url_for('signup') }}'">Signup</button>
+        </div>
     </div>
 </div>
 

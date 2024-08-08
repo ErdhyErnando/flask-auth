@@ -48,7 +48,7 @@
 .hero__clicontainer h3,
 .hero__guicontainer h3 {
   padding-top: 0.25rem;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-style: bold;
   color: #333;
 }
@@ -57,7 +57,7 @@
 .hero__guicontainer p {
 
   line-height: 20%;
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   font-weight: 700;
 }
 
@@ -71,6 +71,13 @@
 }
 
 /* 2. Unautheniticated Login */
+.hero__notauth {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 92%;
+  margin: 0 auto;
+}
 
 .hero__login {
   /* border: 2px solid red; */
@@ -78,12 +85,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 25% 20px;
+  margin: 10% auto;
   padding: 22.5px 22.5px;
   border-radius: 10px;
   background-color: #f8f8f8;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
   gap: 22.5px;
+  max-width: 1024px;
 }
 
 .hero__login h2 {
@@ -144,18 +152,10 @@
 }
 
 @media screen and (min-width: 343px) and (max-width: 768px) {
-  .hero__container {
-    margin: 25px 10px;
-    padding: 22.5px 22.5px;
-  }
 
   .hero__clicontainer,
   .hero__guicontainer {
     padding: 8px 8px auto;
   }
 
-  .hero__login {
-    margin: 25% 10px;
-    padding: 22.5px 22.5px;
-  }
 }

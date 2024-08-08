@@ -11,14 +11,14 @@ body {
   /* border: 2px solid red; */
   display: flex;
   flex-direction: column;
-  margin: 20px 15px;
+  margin: 20px auto;
   padding: 10px 10px;
   border-radius: 10px;
   background-color: #f8f8f8;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
   gap: 12.5px;
   height: 100%;
-
+  max-width: 700px;
 }
 
 .gui__graph {
@@ -56,12 +56,13 @@ body {
   /* border: 2px solid red; */
   display: flex;
   flex-direction: column;
-  margin: 20px 15px;
+  margin: 16px auto;
   padding: 10px 10px;
   border-radius: 10px;
   background-color: #f8f8f8;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
   gap: 12.5px;
+  max-width: 700px;
 }
 
 .gui__fileandparam {
@@ -77,7 +78,7 @@ input[type="file"] {
 
 label.gui__filelabel {
   display: inline-block;
-  padding: 15px 25px;
+  padding: 4px 8px;
 }
 
 .gui__file {
@@ -144,8 +145,8 @@ input::placeholder {
 input.param-input {
   border-radius: 10px;
   width: 100%;
-  padding: 10px 10px;
-  margin: 5px 0px;
+  padding: 8px 8px;
+  margin: 3px 0px;
 }
 
 input.param-input::placeholder {
@@ -159,7 +160,7 @@ input.param-input::placeholder {
   margin: 5px 0px;
   background-color: #007bff;
   color: #ffffff;
-  font-size: 16px;
+  font-size: 0.8rem;
   font-weight: bold;
   cursor: pointer;
 }
@@ -428,8 +429,25 @@ label {
 }
 
 @media screen and (max-width: 560px) {
+
+  .gui__file {
+    margin: 3px auto;
+    padding: 5px 5px;
+  }
+
+  label.gui__filelabel {
+    padding: 3px 6px;
+    font-size: 0.8rem;
+  }
+
   .label-filters {
     font-size: 9px;
+  }
+
+  input.param-input {
+    padding: 6px 6px;
+    margin: 3px 0px;
+    font-size: 0.75rem;
   }
 
 }

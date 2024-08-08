@@ -6,4 +6,5 @@
 
 body {
   font-family: DM Mono, monospace;
+  overflow-y: auto;
 }

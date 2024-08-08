@@ -2,13 +2,14 @@
   /* border: 2px solid red; */
   display: flex;
   flex-direction: column;
-  margin: 10% 30px;
+  margin: 5% auto;
   padding: 20px 20px;
   border-radius: 10px;
   background-color: #f8f8f8;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
   gap: 12.5px;
   min-height: 525px;
+  max-width: 540px;
 }
 
 .uploadfile__header {

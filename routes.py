@@ -14,7 +14,7 @@ import signal
 
 from werkzeug.utils import secure_filename
 
-from utils import split_args, remove_empty_array, get_scripts
+from utils import split_args, remove_empty_array, get_scripts, admin_required
 
 import csv
 from datetime import datetime, timedelta
@@ -149,6 +149,7 @@ def register_routes(app, db, bcrypt, socketio):
 
     # Signup and login routes
     @app.route('/signup', methods=['GET', 'POST'])
+    @admin_required
     def signup():
         if request.method == 'GET':
             return render_template('signup.html')
@@ -206,6 +207,11 @@ def register_routes(app, db, bcrypt, socketio):
     def internal_server_error(e):
         return render_template('500.html'), 500
 
+    @app.errorhandler(403)
+    def forbidden(error):
+        return render_template('403.html'), 403
+    
+
     # Get File Structure
     @app.route('/get_file_structure')
     def get_file_structure():
@@ -245,7 +251,6 @@ def register_routes(app, db, bcrypt, socketio):
             print("Form Data: ", request.form)
             file = request.files['file']
             title = request.form['title']
-            # output_label = request.form['outputLabel']
             selected_folder = request.form['folder']
 
             if file and file.filename.endswith('.py'):
@@ -257,11 +262,6 @@ def register_routes(app, db, bcrypt, socketio):
                 # Save the file
                 file.save(file_path)
 
-                # Save the label to db
-                # new_label = ScriptLabels(script_name=file.filename, Labels=output_label)
-                # db.session.add(new_label)
-                # db.session.commit()
-
                 # Log for debugging
                 print(f"File saved to: {file_path}")
                 
@@ -270,7 +270,6 @@ def register_routes(app, db, bcrypt, socketio):
                 flash('Please select a valid python file', 'error')
         return render_template('uploadfile.html')
 
-        
 
     @app.route('/gui', methods=['GET', 'POST'])
     def gui():
@@ -294,5 +293,3 @@ def register_routes(app, db, bcrypt, socketio):
         file_structure = generate_file_structure(RASP_DIR)
 
         return render_template('gui3.html', file_structure=file_structure, labels_data=labels_data)
-
-

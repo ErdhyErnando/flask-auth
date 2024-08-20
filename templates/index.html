@@ -3,7 +3,7 @@
 
 {% block content %}
 
-{% if current_user.is_authenticated %}
+{% if current_user.is_authenticated and current_user.role == 'admin' %}
 
 <head>
     <meta charset="UTF-8">
@@ -56,10 +56,67 @@
         </div>
     </section>
 
+    <!-- Sign up only for admin -->
+    <section class="upload">
+        <div class="upload__container">
+            <a href="{{ url_for('signup') }}" class="upload_button">Sign Up A New User</a>
+        </div>
+    </section>
+
 </body>
 
 </html>
 
+{% elif current_user.is_authenticated %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,
+    wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/hero.css">
+    <link rel="stylesheet" href="/static/css/upload.css">
+    <link rel="stylesheet" href="/static/css/utils.css">
+    <title>Rasp-WebApp UI</title>
+</head>
+
+<main class="hero">
+    <div class="hero__container">
+
+        <!-- !ALWAYS CHANGE ACCORDING TO DEVICE'S IP-->
+        <a href="https://192.168.122.1:4200" target="_blank">
+            <!-- <a href="https://192.168.122.112:4200" target="_blank"> -->
+            <div class="hero__clicontainer">
+                <div class="cli__image">
+                    <img src="/static/images/cli_interface_3.jpg" alt="cli" class="cli mode pic">
+                </div>
+                <h3>CLI Mode</h3>
+                <p>Command-line interface for script execution.</p>
+                <p></p>
+            </div>
+        </a>
+
+        <a href="{{ url_for('gui') }}">
+            <div class="hero__guicontainer">
+                <div class="gui__image">
+                    <img src="/static/images/gui_interface.jpeg" alt="gui" class="gui mode pic">
+                </div>
+                <h3>GUI Mode</h3>
+                <p>Run scripts and see result with simple clicks</p>
+            </div>
+        </a>
+    </div>
+</main>
+
+<!--Upload New File Page-->
+<section class="upload">
+    <div class="upload__container">
+        <a href="{{ url_for('uploadfile') }}" class="upload_button">Upload New File</a>
+    </div>
+</section>
 
 {% else %}
 
@@ -71,8 +128,6 @@
         <div class="d-grid gap-2">
             <button class="hero__btn" type="button"
                 onclick="window.location.href='{{ url_for('login') }}'">Login</button>
-            <button class="hero__btnsign" type="button"
-                onclick="window.location.href='{{ url_for('signup') }}'">Signup</button>
         </div>
     </div>
 </div>

@@ -8,3 +8,11 @@ body {
   font-family: DM Mono, monospace;
   overflow-y: auto;
 }
+
+#togglePasswordIcon {
+  cursor: pointer;
+}
+
+#togglePasswordIcon:hover {
+  color: #494949;
+}

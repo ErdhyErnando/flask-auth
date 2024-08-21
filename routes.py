@@ -105,13 +105,18 @@ def register_routes(app, db, bcrypt, socketio):
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
         
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now()
         script_name = os.path.splitext(os.path.basename(data['filename']))[0]
-        log_filename = f"{script_name}_log_{timestamp}.txt"
+        log_filename = f"{script_name}_log_{timestamp.strftime('%Y%m%d_%H%M%S')}.txt"
         log_path = os.path.join(log_dir, log_filename)
 
         try:
             with open(log_path, 'w') as f:
+                # write the header
+                f.write(f"File Name             : {script_name}\n")
+                f.write(f"Experiment Date       : {timestamp.strftime('%d.%m.%y')}\n")
+                f.write(f"Experiment Time       : {timestamp.strftime('%H:%M')}\n\n")
+                
                 # Get all unique timestamps
                 all_timestamps = set()
                 for label, points in data['data'].items():

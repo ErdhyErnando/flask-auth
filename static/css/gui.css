@@ -417,6 +417,43 @@ label {
   padding: 2px 4px;
 }
 
+/* delete param form */
+.param-wrapper {
+  position: relative;
+  margin-bottom: 5px;
+}
+
+.param-input {
+  width: 100%;
+  padding-right: 30px;
+  /* Make room for the delete button */
+}
+
+.delete-param-button {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #df3131;
+  border: none;
+  color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: color 0.3s ease;
+  border-radius: 50%;
+}
+
+.delete-param-button:hover {
+  color: #bbbbbb;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+}
+
 @media (max-width: 768px) {
   .label-filter {
     font-size: 12px;
@@ -445,9 +482,18 @@ label {
   }
 
   input.param-input {
-    padding: 6px 6px;
+    /* padding: 6px 6px;
     margin: 3px 0px;
-    font-size: 0.75rem;
+    font-size: 0.75rem; */
+    border-radius: 10px;
+    width: 100%;
+    padding: 8px 30px 8px 8px;
+    /* Increased right padding to make room for button */
+    margin: 3px 0px;
+  }
+
+  .delete-param-button {
+    font-size: 14px;
   }
 
 }

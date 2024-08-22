@@ -72,6 +72,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // log button
     let logButton = document.getElementById('logButton');
 
+    // delete unused param
+    const paramContainer = document.getElementById('paramContainer');
+    const addParamButton = document.getElementById('addParamButton')
+
 
     // Open file explorer modal when "Choose Files" is clicked
     chooseFileLabel.addEventListener('click', function () {
@@ -156,9 +160,42 @@ document.addEventListener("DOMContentLoaded", function () {
         let newParamEnd = Math.min(currentParams + 1, 20);
 
         for (let i = currentParams + 1; i <= newParamEnd; i++) {
-            $('<input type="text" class="param-input" id="param' + (i) + '" name="param' + (i) + '" placeholder="Param ' + (i) + '">').insertBefore('.add-param-button');
+            let newParam = $('<div class="param-wrapper"></div>');
+            newParam.append('<input type="text" class="param-input" id="param' + i + '" name="param' + i + '" placeholder="Param ' + i + '">');
+
+            // Only add delete button if it's beyond the first 5 parameters
+            if (i > 5) {
+                newParam.append('<button class="delete-param-button" data-param="param' + i + '">×</button>');
+            }
+
+            newParam.insertBefore('.add-param-button');
         }
     });
+
+    // New event listener for deleting parameters
+    $(document).on('click', '.delete-param-button', function () {
+        if ($('.param-input').length > 5) {
+            $(this).parent('.param-wrapper').remove();
+            renumberParams();
+        }
+    });
+
+    // Function to renumber parameters after deletion
+    function renumberParams() {
+        $('.param-wrapper').each(function (index) {
+            let paramNumber = (index + 5) + 1;
+            let input = $(this).find('.param-input');
+            input.attr('id', 'param' + paramNumber);
+            input.attr('name', 'param' + paramNumber);
+            input.attr('placeholder', 'Param ' + paramNumber);
+
+            let deleteButton = $(this).find('.delete-param-button');
+            if (deleteButton.length) {
+                deleteButton.attr('data-param', 'param' + paramNumber);
+            }
+
+        });
+    }
 
 
     // Modal for confirmation

@@ -56,12 +56,22 @@
         </div>
 
         <!-- Dynamic param field-->
-        <div class="gui__param">
-            <input type="text" id="param1" class="param-input" name="param1" placeholder="Param 1">
-            <input type="text" id="param2" class="param-input" name="param2" placeholder="Param 2">
-            <input type="text" id="param3" class="param-input" name="param3" placeholder="Param 3">
-            <input type="text" id="param4" class="param-input" name="param4" placeholder="Param 4">
-            <input type="text" id="param5" class="param-input" name="param5" placeholder="Param 5">
+        <div class="gui__param" id="paramContainer">
+            <div class="param-wrapper">
+                <input type="text" id="param1" class="param-input" name="param1" placeholder="Param 1">
+            </div>
+            <div class="param-wrapper">
+                <input type="text" id="param2" class="param-input" name="param2" placeholder="Param 2">
+            </div>
+            <div class="param-wrapper">
+                <input type="text" id="param3" class="param-input" name="param3" placeholder="Param 3">
+            </div>
+            <div class="param-wrapper">
+                <input type="text" id="param4" class="param-input" name="param4" placeholder="Param 4">
+            </div>
+            <div class="param-wrapper">
+                <input type="text" id="param5" class="param-input" name="param5" placeholder="Param 5">
+            </div>
 
             <!-- Button to show more parameters -->
             <button id="showMoreParams" class="add-param-button">Add Params</button>

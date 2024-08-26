@@ -50,8 +50,12 @@ document.addEventListener("DOMContentLoaded", function () {
             plugins: {
                 legend: {
                     labels: {
+                        display: true,
                         font: {
                             size: 10
+                        },
+                        filter: function (legendItem, data) {
+                            return labelFilters[legendItem.text] ? labelFilters[legendItem.text].checked : true;
                         }
                     }
                 }
@@ -183,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Function to renumber parameters after deletion
     function renumberParams() {
         $('.param-wrapper').each(function (index) {
-            let paramNumber = (index + 5) + 1;
+            let paramNumber = (index) + 1;
             let input = $(this).find('.param-input');
             input.attr('id', 'param' + paramNumber);
             input.attr('name', 'param' + paramNumber);
@@ -342,6 +346,14 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // function for legend filter
+    function updateChartLegend() {
+        myChart.options.plugins.legend.labels.filter = function (legendItem, data) {
+            return labelFilters[legendItem.text] ? labelFilters[legendItem.text].checked : true;
+        };
+        myChart.update();
+    }
+
 
     // Handle script output (combining both scripts)
     let startTime = null;
@@ -389,6 +401,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         updateLabelFilter(labels);
+        updateChartLegend();
         myChart.update();
     });
 

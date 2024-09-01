@@ -221,8 +221,23 @@ document.addEventListener("DOMContentLoaded", function () {
                 dataToLog[label] = dataset.data;
             }
         });
+
+        // Gahter user input parameters
+        let params = {};
+        $('.param-input').each(function (index, element) {
+            let paramId = element.id;
+            paramValue = element.value;
+            if (paramValue !== "") {
+                params[paramId] = paramValue;
+            }
+        });
+
         console.log("Data to log", dataToLog);
-        socket.emit("log_data", { data: dataToLog, filename: selectedFile });
+        socket.emit("log_data", {
+            data: dataToLog,
+            filename: selectedFile,
+            params: params
+        });
     }
 
     logButton.addEventListener('click', logData);

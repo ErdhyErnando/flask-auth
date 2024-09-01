@@ -116,6 +116,12 @@ def register_routes(app, db, bcrypt, socketio):
                 f.write(f"File Name             : {script_name}\n")
                 f.write(f"Experiment Date       : {timestamp.strftime('%d.%m.%y')}\n")
                 f.write(f"Experiment Time       : {timestamp.strftime('%H:%M')}\n\n")
+
+                # add user input parameters to headers
+                f.write("User Input Parameters :\n")
+                for param, value in data['params'].items():
+                    f.write(f"{param}: {value}\n")
+                f.write("\n")
                 
                 # Get all unique timestamps
                 all_timestamps = set()

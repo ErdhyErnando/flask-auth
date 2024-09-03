@@ -18,8 +18,6 @@ def run_flask_app():
     - host: '0.0.0.0' (accepts connections from any IP)
     - debug: True (runs in debug mode)
     - allow_unsafe_werkzeug: True (allows running in debug mode with SocketIO)
-
-    This function is typically called when the script is run directly.
     """
     flask_app = create_app()
     socketio.run(flask_app, host='0.0.0.0', debug=True, allow_unsafe_werkzeug=True)

@@ -23,8 +23,8 @@ from sqlalchemy.exc import IntegrityError
 
 # RASP_DIR = '/home/mhstrake28/OrthosisProject/orthosis_interface' # for hanif's linux
 # RASP_DIR = '/home/mhstrake28/flask-auth/orthosis_interface'  # for hanif's linux with sharred array
-RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
-# RASP_DIR = '/home/pi/OrthosisProject/orthosis_interface'  # for orthosis_interface outside raspberry pi
+# RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
+RASP_DIR = '/home/pi/OrthosisProject/orthosis_interface'  # for orthosis_interface outside raspberry pi
 
 
 # All Flask & SocketIO routes
@@ -112,20 +112,25 @@ def register_routes(app, db, bcrypt, socketio):
 
         try:
             with open(log_path, 'w') as f:
-                # write the header
-                f.write(f"File Name             : {script_name}\n")
-                f.write(f"Experiment Date       : {timestamp.strftime('%d.%m.%y')}\n")
-                f.write(f"Experiment Time       : {timestamp.strftime('%H:%M')}\n\n")
-
-                # add user input parameters to headers
-                f.write("User Input Parameters :\n")
+                # Write metadata
+                f.write(f"File Name: {script_name}\n")
+                f.write(f"Experiment Date: {timestamp.strftime('%d.%m.%y')}\n")
+                f.write(f"Experiment Time: {timestamp.strftime('%H:%M')}\n\n")
+                f.write("User Input Parameters:\n")
                 for param, value in data['params'].items():
                     f.write(f"{param}: {value}\n")
                 f.write("\n")
+
+                # Get all unique labels
+                all_labels = list(data['data'].keys())
+                
+                # Write header
+                header = "Time," + ",".join(all_labels)
+                f.write(header + "\n")
                 
                 # Get all unique timestamps
                 all_timestamps = set()
-                for label, points in data['data'].items():
+                for points in data['data'].values():
                     all_timestamps.update(point['x'] for point in points)
                 
                 # Sort timestamps
@@ -136,15 +141,13 @@ def register_routes(app, db, bcrypt, socketio):
                     time_str = str(timedelta(seconds=int(timestamp)))
                     
                     # Collect data for this timestamp
-                    data_points = []
-                    for label, points in data['data'].items():
-                        point = next((p for p in points if p['x'] == timestamp), None)
-                        if point:
-                            data_points.append(f"{label}:{point['y']:.1f}")
+                    row_data = [time_str]
+                    for label in all_labels:
+                        point = next((p for p in data['data'][label] if p['x'] == timestamp), None)
+                        row_data.append(f"{point['y']:.1f}" if point else "")
                     
-                    # Write the line
-                    line = f"time: {time_str} " + ":".join(data_points) + "\n"
-                    f.write(line)
+                    # Write the row
+                    f.write(",".join(row_data) + "\n")
 
             print(f"Log file created: {log_path}")
             emit('logging_complete', {'message': f'Data logged to {log_filename}'})

@@ -38,6 +38,16 @@ body {
   padding: 7px;
 }
 
+.gui__trials {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
 #myChart {
   width: 100% !important;
   height: 100% !important;

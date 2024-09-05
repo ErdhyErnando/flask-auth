@@ -2,6 +2,8 @@
 const DOMAIN = document.domain;
 const PORT = location.port;
 
+const WINDOW_DURATION = 2; // Duration of visible data in seconds
+
 // DOM Elements
 const elements = {
     fileExplorerModal: document.getElementById('fileExplorerModal'),
@@ -27,6 +29,7 @@ let selectedFile = '';
 let labelFilters = {};
 let startTime = null;
 let basePath;
+let fullDataSets = {};
 
 // Chart Configuration
 const chartConfig = {
@@ -47,7 +50,9 @@ const chartConfig = {
                 ticks: {
                     callback: value => value.toFixed(1) + 's',
                     font: { size: 8 }
-                }
+                },
+                min: 0,
+                max: WINDOW_DURATION
             },
             y: {
                 beginAtZero: true,
@@ -134,9 +139,8 @@ function logData() {
     const selectedLabels = Object.keys(labelFilters).filter(label => labelFilters[label].checked);
     const dataToLog = {};
     selectedLabels.forEach(label => {
-        const dataset = myChart.data.datasets.find(ds => ds.label === label);
-        if (dataset) {
-            dataToLog[label] = dataset.data;
+        if (fullDataSets[label]) {
+            dataToLog[label] = fullDataSets[label];
         }
     });
 
@@ -175,6 +179,9 @@ function handleStartButtonClick(event) {
     const command = `python3 ${filename} ${paramStr}`;
     elements.commandText.textContent = command;
     elements.modal.style.display = "block";
+
+    // Reset full data sets
+    fullDataSets = {};
 }
 
 function handleConfirmButtonClick() {
@@ -263,8 +270,20 @@ function handleScriptOutput(data) {
 
     labels.forEach((label, index) => {
         let dataset = myChart.data.datasets.find(ds => ds.label === label);
+        const newDataPoint = { x: currentTime, y: values[index] };
+
         if (dataset) {
-            dataset.data.push({ x: currentTime, y: values[index] });
+            // Add to full data set
+            if (!fullDataSets[label]) {
+                fullDataSets[label] = [];
+            }
+            fullDataSets[label].push(newDataPoint);
+
+            // Add to visible data set
+            dataset.data.push(newDataPoint);
+
+            // Remove data points outside the visible window
+            dataset.data = dataset.data.filter(point => point.x >= currentTime - WINDOW_DURATION);
         } else {
             const color = `rgb(${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})`;
             myChart.data.datasets.push({
@@ -276,8 +295,14 @@ function handleScriptOutput(data) {
                 fill: false,
                 hidden: labelFilters[label] ? !labelFilters[label].checked : false
             });
+
+            fullDataSets[label] = [{ x: currentTime, y: values[index] }];
         }
     });
+
+    // adjust x-axis scale to show the sliding window
+    myChart.options.scales.x.min = Math.max(0, currentTime - WINDOW_DURATION);
+    myChart.options.scales.x.max = currentTime;
 
     updateLabelFilter(labels);
     updateChartLegend();

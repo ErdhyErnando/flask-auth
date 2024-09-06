@@ -23,8 +23,8 @@ from sqlalchemy.exc import IntegrityError
 
 # RASP_DIR = '/home/mhstrake28/OrthosisProject/orthosis_interface' # for hanif's linux
 # RASP_DIR = '/home/mhstrake28/flask-auth/orthosis_interface'  # for hanif's linux with sharred array
-RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
-# RASP_DIR = '/home/pi/OrthosisProject/orthosis_interface'  # for orthosis_interface outside raspberry pi
+# RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
+RASP_DIR = '/home/pi/OrthosisProject/orthosis_interface'  # for orthosis_interface outside raspberry pi
 
 
 # All Flask & SocketIO routes
@@ -144,7 +144,10 @@ def register_routes(app, db, bcrypt, socketio):
                     row_data = [time_str]
                     for label in all_labels:
                         point = next((p for p in data['data'][label] if p['x'] == timestamp), None)
-                        row_data.append(f"{point['y']:.1f}" if point else "")
+                        if point is None or point['y'] is None:
+                            row_data.append("-")
+                        else:
+                            row_data.append(f"{point['y']:.1f}")
                     
                     # Write the row
                     f.write(",".join(row_data) + "\n")

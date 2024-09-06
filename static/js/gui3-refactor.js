@@ -2,7 +2,7 @@
 const DOMAIN = document.domain;
 const PORT = location.port;
 
-const WINDOW_DURATION = 2; // Duration of visible data in seconds
+const WINDOW_DURATION = 5; // Duration of visible data in seconds
 
 // DOM Elements
 const elements = {
@@ -19,7 +19,8 @@ const elements = {
     confirmButton: document.getElementById("confirmButton"),
     commandText: document.getElementById("commandText"),
     output: document.getElementById("output"),
-    labelFilters: document.getElementById('labelFilters')
+    labelFilters: document.getElementById('labelFilters'),
+    trialCount: document.getElementById('trialCount')
 };
 
 // Global Variables
@@ -30,6 +31,7 @@ let labelFilters = {};
 let startTime = null;
 let basePath;
 let fullDataSets = {};
+let trialCount = -1;
 
 // Chart Configuration
 const chartConfig = {
@@ -159,12 +161,19 @@ function logData() {
     });
 }
 
+function resetTrialCount() {
+    trialCount = -1;
+    elements.trialCount.textContent = '0';
+}
+
 function handleStartButtonClick(event) {
     event.preventDefault();
     if (!selectedFile) {
         alert('Please select a file');
         return;
     }
+
+    resetTrialCount();
 
     const params = {};
     $('.param-input').each((index, element) => {
@@ -190,6 +199,8 @@ function handleConfirmButtonClick() {
         params[element.id] = element.value;
     });
 
+    resetTrialCount();
+
     elements.output.textContent = "";
     elements.labelFilters.innerHTML = '';
     labelFilters = {};
@@ -209,6 +220,8 @@ function handleStopButtonClick(event) {
     startTime = null;
     myChart.data.datasets = [];
     myChart.update();
+
+    resetTrialCount();
 }
 
 function updateLabelFilter(labels) {
@@ -252,6 +265,12 @@ function updateChartLegend() {
 function handleScriptOutput(data) {
     elements.output.textContent += data.output;
     elements.output.scrollTop = elements.output.scrollHeight;
+
+    //check for 'new_trial:100' in the output
+    if (data.output.includes('new_trial:100')) {
+        trialCount++;
+        elements.trialCount.textContent = trialCount;
+    }
 
     const parts = data.output.trim().split(":");
     const labels = [];

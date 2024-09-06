@@ -20,7 +20,10 @@ const elements = {
     commandText: document.getElementById("commandText"),
     output: document.getElementById("output"),
     labelFilters: document.getElementById('labelFilters'),
-    trialCount: document.getElementById('trialCount')
+    trialCount: document.getElementById('trialCount'),
+    buttonPressCount: document.getElementById('buttonPressCount'),
+    errorCount: document.getElementById('errorCount'),
+    flexExt: document.getElementById('flexExt')
 };
 
 // Global Variables
@@ -32,6 +35,9 @@ let startTime = null;
 let basePath;
 let fullDataSets = {};
 let trialCount = -1;
+let buttonPressCount = 0;
+let errorCount = 0;
+let previousButtonState = 0;
 
 // Chart Configuration
 const chartConfig = {
@@ -57,6 +63,8 @@ const chartConfig = {
                 max: WINDOW_DURATION
             },
             y: {
+                type: 'linear',
+                position: 'left',
                 beginAtZero: true,
                 title: {
                     display: true,
@@ -161,9 +169,19 @@ function logData() {
     });
 }
 
-function resetTrialCount() {
+function resetCounters() {
     trialCount = -1;
+    buttonPressCount = 0;
+    errorCount = 0;
     elements.trialCount.textContent = '0';
+    elements.buttonPressCount.textContent = '0';
+    elements.errorCount.textContent = '0';
+    elements.flexExt.textContent = '0.00';
+}
+
+function updateButtonPressCount() {
+    buttonPressCount++;
+    elements.buttonPressCount.textContent = buttonPressCount;
 }
 
 function handleStartButtonClick(event) {
@@ -173,11 +191,28 @@ function handleStartButtonClick(event) {
         return;
     }
 
-    resetTrialCount();
-
     const params = {};
+
     $('.param-input').each((index, element) => {
         params[element.id] = element.value;
+        if (element.value.trim().startsWith('-n')) {
+            const parts = element.value.trim().split(/\s+/);
+            if (parts.length > 1) {
+                const parsedValue = parseInt(parts[1]);
+                if (!isNaN(parsedValue)) {
+                    errorCount = parsedValue;
+                    elements.errorCount.textContent = errorCount;
+                } else {
+                    console.warn(`Invalid value for -n flag: ${parts[1]}`);
+                    // Optionally, show a warning to the user
+                    alert(`Invalid value for -n flag: ${parts[1]}`);
+                }
+            } else {
+                console.warn('-n flag used without a value');
+                // Optionally, show a warning to the user
+                alert('-n flag used without a value');
+            }
+        }
     });
 
     const paramStr = Object.values(params)
@@ -199,7 +234,7 @@ function handleConfirmButtonClick() {
         params[element.id] = element.value;
     });
 
-    resetTrialCount();
+    resetCounters();
 
     elements.output.textContent = "";
     elements.labelFilters.innerHTML = '';
@@ -221,7 +256,7 @@ function handleStopButtonClick(event) {
     myChart.data.datasets = [];
     myChart.update();
 
-    resetTrialCount();
+    resetCounters();
 }
 
 function updateLabelFilter(labels) {
@@ -259,26 +294,35 @@ function updateLabelFilter(labels) {
 function updateChartLegend() {
     myChart.options.plugins.legend.labels.filter = (legendItem, data) =>
         labelFilters[legendItem.text] ? labelFilters[legendItem.text].checked : true;
-    myChart.update();
 }
 
 function handleScriptOutput(data) {
     elements.output.textContent += data.output;
     elements.output.scrollTop = elements.output.scrollHeight;
 
-    //check for 'new_trial:100' in the output
-    if (data.output.includes('new_trial:100')) {
-        trialCount++;
-        elements.trialCount.textContent = trialCount;
-    }
-
     const parts = data.output.trim().split(":");
     const labels = [];
     const values = [];
 
     for (let i = 0; i < parts.length - 1; i += 2) {
-        labels.push(parts[i].trim());
-        values.push(Number(parts[i + 1].trim()));
+        const label = parts[i].trim();
+        const value = parts[i + 1].trim();
+
+        if (label === 'new_trial' && value === '100') {
+            trialCount++;
+            elements.trialCount.textContent = trialCount;
+        } else if (label === 'flex_ext') {
+            elements.flexExt.textContent = value;
+        } else if (label === 'is_pressed') {
+            const newButtonState = value === '100' ? 1 : 0;
+            if (newButtonState !== previousButtonState && newButtonState === 1) {
+                updateButtonPressCount();
+            }
+            previousButtonState = newButtonState;
+        }
+
+        labels.push(label);
+        values.push(value);
     }
 
     if (startTime === null) {
@@ -292,7 +336,7 @@ function handleScriptOutput(data) {
         const newDataPoint = { x: currentTime, y: values[index] };
 
         if (dataset) {
-            // Add to full data set
+            // Add to full data sets
             if (!fullDataSets[label]) {
                 fullDataSets[label] = [];
             }
@@ -301,13 +345,13 @@ function handleScriptOutput(data) {
             // Add to visible data set
             dataset.data.push(newDataPoint);
 
-            // Remove data points outside the visible window
+            // remove data points outside the visible window
             dataset.data = dataset.data.filter(point => point.x >= currentTime - WINDOW_DURATION);
         } else {
             const color = `rgb(${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})`;
             myChart.data.datasets.push({
                 label: label,
-                data: [{ x: currentTime, y: values[index] }],
+                data: [newDataPoint],
                 backgroundColor: color,
                 borderColor: color,
                 borderWidth: 1,
@@ -315,7 +359,7 @@ function handleScriptOutput(data) {
                 hidden: labelFilters[label] ? !labelFilters[label].checked : false
             });
 
-            fullDataSets[label] = [{ x: currentTime, y: values[index] }];
+            fullDataSets[label] = [newDataPoint];
         }
     });
 
@@ -407,6 +451,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeChart();
     initializeSocket();
     setupEventListeners();
+    resetCounters();
 
     fetch('/get_file_structure')
         .then(response => response.json())

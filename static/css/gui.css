@@ -48,6 +48,13 @@ body {
   text-align: center;
 }
 
+.gui__trials span {
+  margin: 0 5px;
+  background-color: #d9d9d9;
+  padding: 5px;
+  border-radius: 5px;
+}
+
 #myChart {
   width: 100% !important;
   height: 100% !important;
@@ -485,6 +492,10 @@ label {
   label.gui__filelabel {
     padding: 3px 6px;
     font-size: 0.8rem;
+  }
+
+  .gui__trials {
+    font-size: 0.6rem;
   }
 
   .label-filters {

@@ -8,33 +8,67 @@ import subprocess
 import threading
 import zmq
 import time
-
 import select
 import signal
-
 from werkzeug.utils import secure_filename
-
 from utils import split_args, remove_empty_array, get_scripts, admin_required
-
 import csv
 from datetime import datetime, timedelta
-
 from sqlalchemy.exc import IntegrityError
 
 # RASP_DIR = '/home/mhstrake28/OrthosisProject/orthosis_interface' # for hanif's linux
 # RASP_DIR = '/home/mhstrake28/flask-auth/orthosis_interface'  # for hanif's linux with sharred array
-# RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
-RASP_DIR = '/home/pi/OrthosisProject/orthosis_interface'  # for orthosis_interface outside raspberry pi
-
+RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
+# RASP_DIR = '/home/pi/OrthosisProject/orthosis_interface'  # for orthosis_interface outside raspberry pi
+# RASP_DIR = '/home/pi/OrthosisProject' # for testing pub dummy file 
 
 # All Flask & SocketIO routes
 def register_routes(app, db, bcrypt, socketio):
+    """
+    Register all routes and SocketIO events for the Flask application.
+
+    This function sets up all the routes, SocketIO events, and related functionality
+    for the orthosis web application.
+
+    Parameters
+    ----------
+    app : Flask
+        The Flask application instance.
+    db : SQLAlchemy
+        The SQLAlchemy database instance.
+    bcrypt : Bcrypt
+        The Bcrypt instance for password hashing.
+    socketio : SocketIO
+        The SocketIO instance for real-time communication.
+
+    Notes
+    -----
+    This function defines several nested functions and decorators for various
+    routes and SocketIO events. It handles script execution, data logging,
+    user authentication, file management, and error handling.
+    """
     global running_thread, stop_thread
     running_thread = None
     stop_thread = False 
 
     # Function to run the script; zmq, socketio, subprocess
     def run_script_continuous(script_name, params):
+        """
+        Run a script continuously and emit its output via SocketIO.
+
+        Parameters
+        ----------
+        script_name : str
+            The name of the script to run.
+        params : dict
+            A dictionary of parameters to pass to the script.
+
+        Notes
+        -----
+        This function uses ZeroMQ to receive output from the script and
+        emits it to connected clients via SocketIO. It can be stopped
+        by setting the global stop_thread variable to True.
+        """
         global stop_thread, process
         stop_thread = False
 
@@ -73,6 +107,19 @@ def register_routes(app, db, bcrypt, socketio):
     # SocketIO start and stop script
     @socketio.on('start_script')
     def start_script(data):
+        """
+        SocketIO event handler for starting a script.
+
+        Parameters
+        ----------
+        data : dict
+            A dictionary containing 'filename' and optionally 'params'.
+
+        Notes
+        -----
+        This function starts a new thread to run the specified script if no
+        script is currently running.
+        """
         global running_thread
         filename = data['filename']
         params = data.get('params', {}) 
@@ -84,6 +131,12 @@ def register_routes(app, db, bcrypt, socketio):
 
     @socketio.on('stop_script')
     def stop_script():
+        """
+        SocketIO event handler for stopping the currently running script.
+
+        This function sets the stop_thread flag to True and attempts to
+        terminate the running script process.
+        """
         global stop_thread, running_thread, process
         stop_thread = True
         if running_thread and running_thread.is_alive():
@@ -100,6 +153,19 @@ def register_routes(app, db, bcrypt, socketio):
     # data logging
     @socketio.on('log_data')
     def log_data(data):
+        """
+        SocketIO event handler for logging experimental data.
+
+        Parameters
+        ----------
+        data : dict
+            A dictionary containing 'filename', 'params', and 'data' to be logged.
+
+        Notes
+        -----
+        This function creates a log file with experiment metadata and data points.
+        It emits a 'logging_complete' event when finished.
+        """
         print("Received log data: ", data)
         log_dir = os.path.join(RASP_DIR, 'logs')
         if not os.path.exists(log_dir):
@@ -162,12 +228,32 @@ def register_routes(app, db, bcrypt, socketio):
     # Page routes
     @app.route('/')
     def index():
+        """
+        Render the index page.
+
+        Returns
+        -------
+        str
+            The rendered HTML for the index page.
+        """
         return render_template('index.html')
 
     # Signup and login routes
     @app.route('/signup', methods=['GET', 'POST'])
     @admin_required
     def signup():
+        """
+        Handle user signup (admin only).
+
+        Returns
+        -------
+        str
+            The rendered HTML for the signup page or a redirect response.
+
+        Notes
+        -----
+        This route is protected by the admin_required decorator.
+        """
         if request.method == 'GET':
             return render_template('signup.html')
         elif request.method == 'POST':
@@ -194,6 +280,14 @@ def register_routes(app, db, bcrypt, socketio):
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
+        """
+        Handle user login.
+
+        Returns
+        -------
+        str
+            The rendered HTML for the login page or a redirect response.
+        """
         if request.method == 'GET':
             return render_template('login.html')
         elif request.method == 'POST':
@@ -211,6 +305,14 @@ def register_routes(app, db, bcrypt, socketio):
 
     @app.route('/logout')
     def logout():
+        """
+        Handle user logout.
+
+        Returns
+        -------
+        werkzeug.wrappers.Response
+            A redirect response to the index page.
+        """
         logout_user()
         return redirect(url_for('index'))   
 
@@ -218,20 +320,67 @@ def register_routes(app, db, bcrypt, socketio):
     # Error Pages
     @app.errorhandler(404)
     def page_not_found(e):
+        """
+        Handle 404 Not Found errors.
+
+        Parameters
+        ----------
+        e : Exception
+            The exception that triggered the 404 error.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the rendered 404 page and the status code.
+        """
         return render_template('404.html'), 404
     
     @app.errorhandler(500)
     def internal_server_error(e):
+        """
+        Handle 500 Internal Server Error.
+
+        Parameters
+        ----------
+        e : Exception
+            The exception that triggered the 500 error.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the rendered 500 page and the status code.
+        """
         return render_template('500.html'), 500
 
     @app.errorhandler(403)
     def forbidden(error):
+        """
+        Handle 403 Forbidden errors.
+
+        Parameters
+        ----------
+        error : Exception
+            The exception that triggered the 403 error.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the rendered 403 page and the status code.
+        """
         return render_template('403.html'), 403
     
 
     # Get File Structure
     @app.route('/get_file_structure')
     def get_file_structure():
+        """
+        Get the file structure of the RASP_DIR directory.
+
+        Returns
+        -------
+        flask.Response
+            A JSON response containing the file structure and base path.
+        """
         file_structure = generate_file_structure(RASP_DIR)  
         return jsonify({
             'structure': file_structure,
@@ -239,6 +388,19 @@ def register_routes(app, db, bcrypt, socketio):
         })
 
     def generate_file_structure(path):
+        """
+        Generate a nested dictionary representing the file structure.
+
+        Parameters
+        ----------
+        path : str
+            The root path to start generating the file structure from.
+
+        Returns
+        -------
+        list
+            A list of dictionaries representing the file structure.
+        """
         structure = []
         for item in os.listdir(path):
             item_path = os.path.join(path, item)
@@ -259,11 +421,27 @@ def register_routes(app, db, bcrypt, socketio):
     # File upload and GUI routes
     @app.route('/get_folders')
     def get_folders():
+        """
+        Get a list of folders in the RASP_DIR directory.
+
+        Returns
+        -------
+        flask.Response
+            A JSON response containing a list of folder names.
+        """
         folders = [f for f in os.listdir(RASP_DIR) if os.path.isdir(os.path.join(RASP_DIR, f))]
         return jsonify({'folders': folders})
 
     @app.route('/uploadfile', methods=['GET', 'POST'])
     def uploadfile(): 
+        """
+        Handle file uploads.
+
+        Returns
+        -------
+        str
+            The rendered HTML for the upload file page or a redirect response.
+        """
         if request.method == 'POST':
             print("Form Data: ", request.form)
             file = request.files['file']
@@ -290,6 +468,20 @@ def register_routes(app, db, bcrypt, socketio):
 
     @app.route('/gui', methods=['GET', 'POST'])
     def gui():
+        """
+        Handle the main GUI page.
+
+        Returns
+        -------
+        str
+            The rendered HTML for the GUI page.
+
+        Notes
+        -----
+        This function handles both GET and POST requests. For POST requests,
+        it starts the selected script. It also prepares the file structure
+        and script labels for the GUI.
+        """
         if request.method == 'POST':
             selected_script = request.form.get('script')
             script_path = os.path.join(RASP_DIR, selected_script)

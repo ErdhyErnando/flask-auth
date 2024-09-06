@@ -38,6 +38,7 @@ let trialCount = -1;
 let buttonPressCount = 0;
 let errorCount = 0;
 let previousButtonState = 0;
+let previousDisturbIntroState = 0;
 
 // Chart Configuration
 const chartConfig = {
@@ -184,6 +185,11 @@ function updateButtonPressCount() {
     elements.buttonPressCount.textContent = buttonPressCount;
 }
 
+function updateErrorCount() {
+    errorCount++;
+    elements.errorCount.textContent = errorCount;
+}
+
 function handleStartButtonClick(event) {
     event.preventDefault();
     if (!selectedFile) {
@@ -319,6 +325,12 @@ function handleScriptOutput(data) {
                 updateButtonPressCount();
             }
             previousButtonState = newButtonState;
+        } else if (label === 'disturb_intro') {
+            const newDisturbIntroState = value === '100' ? 1 : 0;
+            if (newDisturbIntroState !== previousDisturbIntroState && newDisturbIntroState === 1) {
+                updateErrorCount();
+            }
+            previousDisturbIntroState = newDisturbIntroState;
         }
 
         labels.push(label);

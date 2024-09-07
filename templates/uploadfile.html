@@ -24,6 +24,17 @@
 
     <!-- Upload File Section-->
     <main class="uploadfile__container">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
         <div class="uploadfile__header">
             <h2>Add New File</h2>
         </div>
@@ -92,7 +103,6 @@
             event.preventDefault();
 
             let title = document.getElementById('title').value;
-            //let outputLabel = document.getElementById('outputLabel').value;
             let fileInput = document.getElementById('hiddenFileInput');
             let file = fileInput.files[0];
 
@@ -110,7 +120,6 @@
 
             let formData = new FormData();
             formData.append('title', title);
-            //formData.append('outputLabel', outputLabel);
             formData.append('file', file);
             formData.append('folder', selectedFolder);
 

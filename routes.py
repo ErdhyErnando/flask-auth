@@ -461,9 +461,14 @@ def register_routes(app, db, bcrypt, socketio):
                 print(f"File saved to: {file_path}")
                 
                 flash('File and label uploaded successfully', 'success')
+                return redirect(url_for('uploadfile'))
             else:
                 flash('Please select a valid python file', 'error')
+                return redirect(url_for('uploadfile'))
+            
+        # clear any existing flash messages when renderin the upload page
         return render_template('uploadfile.html')
+    
 
 
     @app.route('/gui', methods=['GET', 'POST'])

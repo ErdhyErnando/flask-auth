@@ -57,11 +57,20 @@
 
             <!-- Select Folder -->
             <div class="uploadfile__folder">
-                <label for="folder">Select Folder</label>
-                <select name="folder" id="folder" required>
-
-                </select>
+                <label for="folder">Select Folder -></label>
+                <div id="selectedFolderDisplay">No folder selected</div>
+                <button id="chooseFolderButton" type="button">Choose Folder</button>
             </div>
+
+            <!-- File explorer modal -->
+            <div id="fileExplorerModal" class="feModal">
+                <div class="fe-modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Select a Folder</h2>
+                    <div id="fileExplorer"></div>
+                </div>
+            </div>
+
 
             <div class="uploadfile__progress">
                 <progress id="fileUploadProgress" value="0" max="100"></progress>
@@ -76,6 +85,140 @@
         </form>
     </main>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let basePath;
+            let selectedFolder = '';
+
+            // Fetch file structure
+            fetch('/get_file_structure')
+                .then(response => response.json())
+                .then(data => {
+                    basePath = data.base_path;
+                    createFileExplorer(data.structure, document.getElementById('fileExplorer'), basePath);
+                });
+
+            // File explorer creation function
+            function createFileExplorer(structure, parentElement, path = basePath) {
+                structure.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.classList.add('file-explorer-item');
+
+                    if (item.type === 'folder') {
+                        itemElement.innerHTML = `<span class="folder-icon">📁</span> ${item.name}`;
+                        itemElement.classList.add('folder');
+                        const childrenContainer = document.createElement('div');
+                        childrenContainer.classList.add('folder-children');
+                        childrenContainer.style.display = 'none';
+                        createFileExplorer(item.children, childrenContainer, `${path}/${item.name}`);
+                        itemElement.appendChild(childrenContainer);
+
+                        itemElement.addEventListener('click', e => {
+                            e.stopPropagation();
+                            childrenContainer.style.display = childrenContainer.style.display === 'none' ? 'block' : 'none';
+                            selectedFolder = `${path}/${item.name}`.replace(basePath + '/', '');
+                            document.getElementById('selectedFolderDisplay').textContent = selectedFolder;
+                        });
+                    }
+
+                    parentElement.appendChild(itemElement);
+                });
+            }
+
+            // Event listener for the Choose Folder button
+            document.getElementById('chooseFolderButton').addEventListener('click', () => {
+                document.getElementById('fileExplorerModal').style.display = 'block';
+            });
+
+            // Close modal when clicking on the close button
+            document.querySelector('.close').addEventListener('click', () => {
+                document.getElementById('fileExplorerModal').style.display = 'none';
+            });
+
+            // Close modal when clicking outside of it
+            window.onclick = event => {
+                if (event.target == document.getElementById('fileExplorerModal')) {
+                    document.getElementById('fileExplorerModal').style.display = 'none';
+                }
+            };
+
+            document.querySelector('.uploadfile__uploadtext').addEventListener('click', function () {
+                document.getElementById('hiddenFileInput').click();
+            });
+
+            // Regex for python file
+            const isPythonFile = (filename) => { return /\.py$/.test(filename); }
+
+            document.getElementById('uploadForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                let title = document.getElementById('title').value;
+                let fileInput = document.getElementById('hiddenFileInput');
+                let file = fileInput.files[0];
+
+                if (file) {
+                    if (!isPythonFile(file.name)) {
+                        alert('Please upload a Python file (.py) only');
+                        return;
+                    }
+                } else {
+                    alert('Please select a file to upload');
+                    return;
+                }
+
+                if (!selectedFolder) {
+                    alert('Please select a folder for upload');
+                    return;
+                }
+
+                let formData = new FormData();
+                formData.append('title', title);
+                formData.append('file', file);
+                formData.append('folder', selectedFolder);
+
+                let xhr = new XMLHttpRequest();
+                xhr.open('POST', '{{ url_for("uploadfile") }}', true);
+
+                xhr.upload.onprogress = function (event) {
+                    if (event.lengthComputable) {
+                        let percentComplete = (event.loaded / event.total) * 100;
+                        document.getElementById('fileUploadProgress').value = percentComplete;
+                        document.getElementById('progress-label').innerHTML = Math.round(percentComplete) + "%";
+                    }
+                };
+
+                // Show upload progress and feedback
+                xhr.onload = function () {
+                    if (xhr.status == 200) {
+                        document.getElementById('feedback').innerHTML = '<span>File <u>' + file.name + '</u> has been uploaded successfully.</span>';
+                    } else {
+                        document.getElementById('feedback').innerHTML = '<span>Error uploading file <u>' + file.name + '</u>. Please try again.</span>';
+                    }
+                };
+
+                xhr.onerror = function () {
+                    document.getElementById('feedback').innerHTML = '<span>Error uploading file <u>' + file.name + '</u>. Please try again.</span>';
+                };
+
+                xhr.send(formData);
+            });
+
+            // Add file title to the upload text 
+            document.getElementById('hiddenFileInput').addEventListener('change', function () {
+                let filename = this.files[0].name;
+                document.querySelector('.uploadfile__uploadtext p').textContent = filename;
+            });
+
+            // Automatically add file title to the title input
+            document.getElementById('hiddenFileInput').addEventListener('change', function () {
+                let filename = this.files[0].name;
+                document.querySelector('.uploadfile__uploadtext p').textContent = filename;
+                document.getElementById('title').value = filename;
+            });
+        });
+    </script>
+
+    <!--
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             fetch('/get_folders')
@@ -167,6 +310,8 @@
         });
 
     </script>
+    -->
+
 </body>
 
 </html>

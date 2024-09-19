@@ -1,4 +1,8 @@
 /*1. Hero Section */
+body,
+html {
+  height: 100%;
+}
 
 .hero {
   display: flex;
@@ -75,13 +79,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 92%;
-  margin: 0 auto;
+  height: 65vh;
+  background-image: url('https://source.unsplash.com/random/1920x1080/?nature');
+  background-size: cover;
+  background-position: center;
 }
 
 .hero__login {
   /* border: 2px solid red; */
-  display: flex;
+  /* display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -90,8 +96,22 @@
   border-radius: 10px;
   background-color: #f8f8f8;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
-  gap: 22.5px;
-  max-width: 1024px;
+  gap: 0.7rem;
+  max-width: 1024px; */
+
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+}
+
+.hero__logintitle {
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
 }
 
 .hero__login h2 {
@@ -99,17 +119,25 @@
   font-weight: 700;
 }
 
+
+
+.hero__login h2:nth-child(2) {
+  color: #666;
+  margin-top: 1rem;
+  font-size: 1rem;
+  margin-bottom: 1.25rem;
+}
+
 .hero__btn {
-  background-color: #33ff6c;
-  color: #ffffff;
-  border: 1.5px solid #ffffff;
-  padding: 10px 70px;
-  text-align: center;
-  text-decoration: none;
-  display: inline;
-  font-size: 14px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px 0;
+  width: 100%;
+  font-size: 1rem;
+  border-radius: 25px;
   cursor: pointer;
-  border-radius: 16px;
+  transition: background-color 0.3s ease;
 }
 
 .hero__btnsign {
@@ -126,8 +154,12 @@
 }
 
 .hero__btn:hover {
-  background-color: #31df62;
-  color: #000;
+  background-color: #45a049;
+}
+
+.emoji {
+  font-size: 4rem;
+  margin-bottom: 1rem;
 }
 
 .hero__btnsign:hover {

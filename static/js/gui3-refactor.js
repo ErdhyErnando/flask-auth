@@ -325,16 +325,15 @@ function handleScriptOutput(data) {
                 updateButtonPressCount();
             }
             previousButtonState = newButtonState;
-        } else if (label === 'disturb_intro') {
-            const newDisturbIntroState = value === '100' ? 1 : 0;
-            if (newDisturbIntroState !== previousDisturbIntroState && newDisturbIntroState === 1) {
-                updateErrorCount();
-            }
-            previousDisturbIntroState = newDisturbIntroState;
+        } else if (label === 'err_count') {
+            errorCount = parseInt(value);
+            elements.errorCount.textContent = errorCount;
         }
 
-        labels.push(label);
-        values.push(value);
+        if (label !== 'err_count') {
+            labels.push(label);
+            values.push(value);
+        }
     }
 
     if (startTime === null) {

@@ -88,17 +88,25 @@ const chartConfig = {
     }
 };
 
-// Functions
+/**
+ * Initializes the chart using Chart.js library.
+ */
 function initializeChart() {
     const ctx = document.getElementById('myChart').getContext('2d');
     myChart = new Chart(ctx, chartConfig);
 }
 
+/**
+ * Initializes the WebSocket connection.
+ */
 function initializeSocket() {
     socket = io.connect(`http://${DOMAIN}:${PORT}`);
     setupSocketListeners();
 }
 
+/**
+ * Sets up WebSocket event listeners.
+ */
 function setupSocketListeners() {
     socket.on("logging_complete", data => {
         console.log("logging complete", data.message);
@@ -114,6 +122,12 @@ function setupSocketListeners() {
     socket.on('sudo_command_result', handleSudoCommandResult);
 }
 
+/**
+ * Creates the file explorer structure in the DOM.
+ * @param {Object[]} structure - The file/folder structure to display.
+ * @param {HTMLElement} parentElement - The parent element to append the structure to.
+ * @param {string} [path=basePath] - The current path in the file structure.
+ */
 function createFileExplorer(structure, parentElement, path = basePath) {
     structure.forEach(item => {
         const itemElement = document.createElement('div');
@@ -148,6 +162,9 @@ function createFileExplorer(structure, parentElement, path = basePath) {
     });
 }
 
+/**
+ * Logs the selected data to the server.
+ */
 function logData() {
     const selectedLabels = Object.keys(labelFilters).filter(label => labelFilters[label].checked);
     const dataToLog = {};
@@ -172,6 +189,9 @@ function logData() {
     });
 }
 
+/**
+ * Resets all counters and updates the corresponding DOM elements.
+ */
 function resetCounters() {
     trialCount = -1;
     buttonPressCount = 0;
@@ -182,16 +202,26 @@ function resetCounters() {
     elements.flexExt.textContent = '0.00';
 }
 
+/**
+ * Increments the button press count and updates the DOM.
+ */
 function updateButtonPressCount() {
     buttonPressCount++;
     elements.buttonPressCount.textContent = buttonPressCount;
 }
 
+/**
+ * Increments the error count and updates the DOM.
+ */
 function updateErrorCount() {
     errorCount++;
     elements.errorCount.textContent = errorCount;
 }
 
+/**
+ * Handles the start button click event.
+ * @param {Event} event - The click event object.
+ */
 function handleStartButtonClick(event) {
     event.preventDefault();
     if (!selectedFile) {
@@ -236,6 +266,9 @@ function handleStartButtonClick(event) {
     fullDataSets = {};
 }
 
+/**
+ * Handles the confirm button click event in the command modal.
+ */
 function handleConfirmButtonClick() {
     const params = {};
     $('.param-input').each((index, element) => {
@@ -256,6 +289,10 @@ function handleConfirmButtonClick() {
     elements.modal.style.display = "none";
 }
 
+/**
+ * Handles the stop button click event.
+ * @param {Event} event - The click event object.
+ */
 function handleStopButtonClick(event) {
     event.preventDefault();
     socket.emit("stop_script");
@@ -267,6 +304,10 @@ function handleStopButtonClick(event) {
     resetCounters();
 }
 
+/**
+ * Updates the label filter checkboxes based on the received data labels.
+ * @param {string[]} labels - The data labels to create filters for.
+ */
 function updateLabelFilter(labels) {
     labels.forEach(label => {
         if (!labelFilters.hasOwnProperty(label)) {
@@ -299,11 +340,18 @@ function updateLabelFilter(labels) {
     });
 }
 
+/**
+ * Updates the chart legend based on the current label filter states.
+ */
 function updateChartLegend() {
     myChart.options.plugins.legend.labels.filter = (legendItem, data) =>
         labelFilters[legendItem.text] ? labelFilters[legendItem.text].checked : true;
 }
 
+/**
+ * Handles the script output received from the server.
+ * @param {Object} data - The output data object.
+ */
 function handleScriptOutput(data) {
     // Format the output for display
     const formattedOutput = formatOutputForDisplay(data.output);
@@ -387,7 +435,11 @@ function handleScriptOutput(data) {
     myChart.update();
 }
 
-// Add this new function to format the output
+/**
+ * Formats the output for display by limiting decimal places for certain values and seperate values using ';'.
+ * @param {string} output - The raw output string.
+ * @returns {string} The formatted output string.
+ */
 function formatOutputForDisplay(output) {
     const parts = output.trim().split(":");
     const formattedParts = [];
@@ -407,7 +459,9 @@ function formatOutputForDisplay(output) {
     return formattedParts.join(';');
 }
 
-// Event Listeners
+/**
+ * Sets up all event listeners for the application.
+ */
 function setupEventListeners() {
     elements.chooseFileLabel.addEventListener('click', () => {
         elements.fileExplorerModal.style.display = 'block';
@@ -469,6 +523,9 @@ function setupEventListeners() {
     sudoButton.addEventListener('click', handleSudoButtonClick);
 }
 
+/**
+ * Renumbers the parameter input fields after deletion.
+ */
 function renumberParams() {
     $('.param-wrapper').each((index, wrapper) => {
         const paramNumber = index + 1;
@@ -499,13 +556,21 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 });
 
-// Add this new function to handle the Sudo button click
+/**
+ * Handles the Sudo button click event.
+ * @param {Event} event - The click event object.
+ */
 function handleSudoButtonClick(event) {
     event.preventDefault();
     socket.emit('run_sudo_command');
 }
 
-// Add this new function to handle the sudo command result
+/**
+ * Handles the result of a sudo command execution.
+ * @param {Object} data - The result data object.
+ * @param {boolean} data.success - Indicates if the command was successful.
+ * @param {string} data.message - The result message.
+ */
 function handleSudoCommandResult(data) {
     if (data.success) {
         alert('Success: ' + data.message);

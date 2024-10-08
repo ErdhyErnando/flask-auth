@@ -528,3 +528,22 @@ label {
     font-size: 10px;
   }
 }
+
+.gui__sudobutton {
+  border-radius: 10px;
+  font-family: DM Mono, monospace;
+  width: 25%;
+  padding: 8px 10px;
+  margin: 5px 0px;
+  background-color: #6f6f6f;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.gui__sudobutton:hover {
+  background-color: #4a4a4a;
+  color: #000000;
+  border: 2px solid #f8f8f8;
+}

@@ -227,6 +227,21 @@ def register_routes(app, db, bcrypt, socketio):
             print("Error during logging: {}".format(str(e)))
             emit('logging_complete', {'message': 'Error during logging: {}'.format(str(e))})
 
+    @socketio.on('run_sudo_command')
+    def run_sudo_command():
+        try:
+            # Run the sudo command
+            result = subprocess.run(['sudo', 'ip', 'link', 'set', 'can0', 'up', 'type', 'can', 'bitrate', '1000000'], 
+                                    capture_output=True, text=True, check=True)
+            
+            # If the command was successful, emit a success message
+            emit('sudo_command_result', {'success': True, 'message': 'CAN interface successfully configured'})
+        except subprocess.CalledProcessError as e:
+            # If there was an error, emit an error message
+            emit('sudo_command_result', {'success': False, 'message': f'Error: {e.stderr}'})
+        except Exception as e:
+            # For any other exceptions, emit a generic error message
+            emit('sudo_command_result', {'success': False, 'message': f'An unexpected error occurred: {str(e)}'})
 
     # Page routes
     @app.route('/')

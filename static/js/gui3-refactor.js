@@ -110,6 +110,8 @@ function setupSocketListeners() {
     });
 
     socket.on("script_output", handleScriptOutput);
+
+    socket.on('sudo_command_result', handleSudoCommandResult);
 }
 
 function createFileExplorer(structure, parentElement, path = basePath) {
@@ -440,6 +442,9 @@ function setupEventListeners() {
             elements.modal.style.display = "none";
         }
     };
+
+    const sudoButton = document.getElementById('sudoButton');
+    sudoButton.addEventListener('click', handleSudoButtonClick);
 }
 
 function renumberParams() {
@@ -471,3 +476,18 @@ document.addEventListener("DOMContentLoaded", () => {
             createFileExplorer(data.structure, elements.fileExplorer, basePath);
         });
 });
+
+// Add this new function to handle the Sudo button click
+function handleSudoButtonClick(event) {
+    event.preventDefault();
+    socket.emit('run_sudo_command');
+}
+
+// Add this new function to handle the sudo command result
+function handleSudoCommandResult(data) {
+    if (data.success) {
+        alert('Success: ' + data.message);
+    } else {
+        alert('Error: ' + data.message);
+    }
+}

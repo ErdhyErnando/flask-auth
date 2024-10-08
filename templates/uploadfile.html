@@ -86,11 +86,17 @@
     </main>
 
     <script>
+        /**
+         * Main function that runs when the DOM content is loaded.
+         * Sets up the file explorer, event listeners, and form submission handling.
+         */
         document.addEventListener('DOMContentLoaded', function () {
             let basePath;
             let selectedFolder = '';
 
-            // Fetch file structure
+            /**
+             * Fetches the file structure from the server and initializes the file explorer.
+             */
             fetch('/get_file_structure')
                 .then(response => response.json())
                 .then(data => {
@@ -98,7 +104,12 @@
                     createFileExplorer(data.structure, document.getElementById('fileExplorer'), basePath);
                 });
 
-            // File explorer creation function
+            /**
+             * Recursively creates the file explorer structure in the DOM.
+             * @param {Object[]} structure - The file/folder structure to display.
+             * @param {HTMLElement} parentElement - The parent element to append the structure to.
+             * @param {string} path - The current path in the file structure.
+             */
             function createFileExplorer(structure, parentElement, path = basePath) {
                 structure.forEach(item => {
                     const itemElement = document.createElement('div');
@@ -125,30 +136,50 @@
                 });
             }
 
-            // Event listener for the Choose Folder button
+            // Event Listeners
+
+            /**
+             * Opens the file explorer modal when the Choose Folder button is clicked.
+             */
             document.getElementById('chooseFolderButton').addEventListener('click', () => {
                 document.getElementById('fileExplorerModal').style.display = 'block';
             });
 
-            // Close modal when clicking on the close button
+            /**
+             * Closes the file explorer modal when the close button is clicked.
+             */
             document.querySelector('.close').addEventListener('click', () => {
                 document.getElementById('fileExplorerModal').style.display = 'none';
             });
 
-            // Close modal when clicking outside of it
+            /**
+             * Closes the file explorer modal when clicking outside of it.
+             */
             window.onclick = event => {
                 if (event.target == document.getElementById('fileExplorerModal')) {
                     document.getElementById('fileExplorerModal').style.display = 'none';
                 }
             };
 
+            /**
+             * Triggers the hidden file input when the upload text area is clicked.
+             */
             document.querySelector('.uploadfile__uploadtext').addEventListener('click', function () {
                 document.getElementById('hiddenFileInput').click();
             });
 
-            // Regex for python file
+            /**
+             * Checks if a filename has a .py extension.
+             * @param {string} filename - The filename to check.
+             * @returns {boolean} True if the file has a .py extension, false otherwise.
+             */
             const isPythonFile = (filename) => { return /\.py$/.test(filename); }
 
+            /**
+             * Handles the form submission for file upload.
+             * Performs validation and sends the file data to the server.
+             * @param {Event} event - The submit event.
+             */
             document.getElementById('uploadForm').addEventListener('submit', function (event) {
                 event.preventDefault();
 
@@ -187,7 +218,6 @@
                     }
                 };
 
-                // Show upload progress and feedback
                 xhr.onload = function () {
                     if (xhr.status == 200) {
                         document.getElementById('feedback').innerHTML = '<span>File <u>' + file.name + '</u> has been uploaded successfully.</span>';
@@ -203,13 +233,17 @@
                 xhr.send(formData);
             });
 
-            // Add file title to the upload text 
+            /**
+             * Updates the upload text area with the selected filename.
+             */
             document.getElementById('hiddenFileInput').addEventListener('change', function () {
                 let filename = this.files[0].name;
                 document.querySelector('.uploadfile__uploadtext p').textContent = filename;
             });
 
-            // Automatically add file title to the title input
+            /**
+             * Automatically adds the selected filename to the title input.
+             */
             document.getElementById('hiddenFileInput').addEventListener('change', function () {
                 let filename = this.files[0].name;
                 document.querySelector('.uploadfile__uploadtext p').textContent = filename;
@@ -217,100 +251,6 @@
             });
         });
     </script>
-
-    <!--
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            fetch('/get_folders')
-                .then(response => response.json())
-                .then(data => {
-                    const folderSelect = document.getElementById('folder');
-                    data.folders.forEach(folder => {
-                        const option = document.createElement('option');
-                        option.value = folder;
-                        option.textContent = folder;
-                        folderSelect.appendChild(option);
-                    });
-                });
-        });
-
-        document.querySelector('.uploadfile__uploadtext').addEventListener('click', function () {
-            document.getElementById('hiddenFileInput').click();
-        });
-
-
-        // Regex for python file
-        const isPythonFile = (filename) => { return /\.py$/.test(filename); }
-
-        document.getElementById('uploadForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            let title = document.getElementById('title').value;
-            let fileInput = document.getElementById('hiddenFileInput');
-            let file = fileInput.files[0];
-
-            let selectedFolder = document.getElementById('folder').value;
-
-            if (file) {
-                if (!isPythonFile(file.name)) {
-                    alert('Please upload a Python file (.py) only');
-                    return;
-                }
-            } else {
-                alert('Please select a file to upload');
-                return;
-            }
-
-            let formData = new FormData();
-            formData.append('title', title);
-            formData.append('file', file);
-            formData.append('folder', selectedFolder);
-
-
-
-            let xhr = new XMLHttpRequest();
-            xhr.open('POST', '{{ url_for("uploadfile") }}', true);
-
-            xhr.upload.onprogress = function (event) {
-                if (event.lengthComputable) {
-                    let percentComplete = (event.loaded / event.total) * 100;
-                    document.getElementById('fileUploadProgress').value = percentComplete;
-                    document.getElementById('progress-label').innerHTML = Math.round(percentComplete) + "%";
-                }
-            };
-
-            // Show upload progress and feedback
-            xhr.onload = function () {
-                if (xhr.status == 200) {
-                    document.getElementById('feedback').innerHTML = '<span>File <u>' + file.name + '</u> has been uploaded successfully.</span>';
-                } else {
-                    document.getElementById('feedback').innerHTML = '<span>Error uploading file <u>' + file.name + '</u>. Please try again.</span>';
-                }
-            };
-
-            xhr.onerror = function () {
-                document.getElementById('feedback').innerHTML = '<span>Error uploading file <u>' + file.name + '</u>. Please try again.</span>';
-            };
-
-            xhr.send(formData);
-        });
-
-
-        // Add file title to the upload text 
-        document.getElementById('hiddenFileInput').addEventListener('change', function () {
-            let filename = this.files[0].name;
-            document.querySelector('.uploadfile__uploadtext p').textContent = filename;
-        });
-
-        // Autiomatically add file title to the title input
-        document.getElementById('hiddenFileInput').addEventListener('change', function () {
-            let filename = this.files[0].name;
-            document.querySelector('.uploadfile__uploadtext p').textContent = filename;
-            document.getElementById('title').value = filename;
-        });
-
-    </script>
-    -->
 
 </body>
 

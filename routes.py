@@ -18,8 +18,8 @@ from sqlalchemy.exc import IntegrityError
 
 # RASP_DIR = '/home/mhstrake28/OrthosisProject/orthosis_interface' # for hanif's linux
 # RASP_DIR = '/home/mhstrake28/flask-auth/orthosis_interface'  # for hanif's linux with sharred array
-RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
-# RASP_DIR = '/home/pi/OrthosisProject/orthosis_interface'  # for orthosis_interface outside raspberry pi
+# RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
+RASP_DIR = '/home/pi/OrthosisProject/orthosis_interface'  # for orthosis_interface outside raspberry pi
 # RASP_DIR = '/home/pi/OrthosisProject' # for testing pub dummy file 
 
 # All Flask & SocketIO routes
@@ -173,18 +173,18 @@ def register_routes(app, db, bcrypt, socketio):
         
         timestamp = datetime.now()
         script_name = os.path.splitext(os.path.basename(data['filename']))[0]
-        log_filename = f"{script_name}_log_{timestamp.strftime('%Y%m%d_%H%M%S')}.txt"
+        log_filename = "{}_log_{}.txt".format(script_name, timestamp.strftime('%Y%m%d_%H%M%S'))
         log_path = os.path.join(log_dir, log_filename)
 
         try:
             with open(log_path, 'w') as f:
                 # Write metadata
-                f.write(f"File Name: {script_name}\n")
-                f.write(f"Experiment Date: {timestamp.strftime('%d.%m.%y')}\n")
-                f.write(f"Experiment Time: {timestamp.strftime('%H:%M')}\n\n")
+                f.write("File Name: {}\n".format(script_name))
+                f.write("Experiment Date: {}\n".format(timestamp.strftime('%d.%m.%y')))
+                f.write("Experiment Time: {}\n\n".format(timestamp.strftime('%H:%M')))
                 f.write("User Input Parameters:\n")
                 for param, value in data['params'].items():
-                    f.write(f"{param}: {value}\n")
+                    f.write("{}\n".format(value))
                 f.write("\n")
 
                 # Get all unique labels
@@ -212,17 +212,20 @@ def register_routes(app, db, bcrypt, socketio):
                         point = next((p for p in data['data'][label] if p['x'] == timestamp), None)
                         if point is None or point['y'] is None:
                             row_data.append("-")
+                        elif isinstance(point['y'], (int, float)):
+                            row_data.append("{:.1f}".format(point['y']))
                         else:
-                            row_data.append(f"{point['y']:.1f}")
+                            # Handle non-numeric data (e.g., strings)
+                            row_data.append(str(point['y']))
                     
                     # Write the row
                     f.write(",".join(row_data) + "\n")
 
-            print(f"Log file created: {log_path}")
-            emit('logging_complete', {'message': f'Data logged to {log_filename}'})
+            print("Log file created: {}".format(log_path))
+            emit('logging_complete', {'message': 'Data logged to {}'.format(log_filename)})
         except Exception as e:
-            print(f"Error during logging: {str(e)}")
-            emit('logging_complete', {'message': f'Error during logging: {str(e)}'})
+            print("Error during logging: {}".format(str(e)))
+            emit('logging_complete', {'message': 'Error during logging: {}'.format(str(e))})
 
 
     # Page routes

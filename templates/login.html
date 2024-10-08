@@ -64,14 +64,20 @@
                 integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
                 crossorigin="anonymous"></script>
             <script>
+                /**
+                 * Toggles the visibility of the password input field.
+                 * Changes the input type between 'password' and 'text', and updates the eye icon accordingly.
+                 */
                 function togglePasswordVisibility() {
                     const passwordInput = document.getElementById('password');
                     const togglePasswordIcon = document.getElementById('togglePasswordIcon');
                     if (passwordInput.type === 'password') {
+                        // Change to visible text
                         passwordInput.type = 'text';
                         togglePasswordIcon.classList.remove('fa-eye');
                         togglePasswordIcon.classList.add('fa-eye-slash');
                     } else {
+                        // Change back to hidden password
                         passwordInput.type = 'password';
                         togglePasswordIcon.classList.remove('fa-eye-slash');
                         togglePasswordIcon.classList.add('fa-eye');

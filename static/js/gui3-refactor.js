@@ -305,7 +305,9 @@ function updateChartLegend() {
 }
 
 function handleScriptOutput(data) {
-    elements.output.textContent += data.output;
+    // Format the output for display
+    const formattedOutput = formatOutputForDisplay(data.output);
+    elements.output.textContent += formattedOutput + '\n';
     elements.output.scrollTop = elements.output.scrollHeight;
 
     const parts = data.output.trim().split(":");
@@ -383,6 +385,26 @@ function handleScriptOutput(data) {
     updateLabelFilter(labels);
     updateChartLegend();
     myChart.update();
+}
+
+// Add this new function to format the output
+function formatOutputForDisplay(output) {
+    const parts = output.trim().split(":");
+    const formattedParts = [];
+
+    for (let i = 0; i < parts.length - 1; i += 2) {
+        const label = parts[i].trim();
+        const value = parts[i + 1].trim();
+
+        if (label === 'orth_pos') {
+            // Limit orth_pos to 2 decimal places
+            formattedParts.push(`${label}:${parseFloat(value).toFixed(2)}`);
+        } else {
+            formattedParts.push(`${label}:${value}`);
+        }
+    }
+
+    return formattedParts.join(';');
 }
 
 // Event Listeners

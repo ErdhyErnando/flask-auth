@@ -2,7 +2,7 @@
 const DOMAIN = document.domain;
 const PORT = location.port;
 
-const WINDOW_DURATION = 5; // Duration of visible data in seconds
+const WINDOW_DURATION = 1; // Duration of visible data in seconds
 
 // DOM Elements
 const elements = {
@@ -243,7 +243,7 @@ function handleStartButtonClick(event) {
                 } else {
                     console.warn(`Invalid value for -n flag: ${parts[1]}`);
                     // Optionally, show a warning to the user
-                    alert(`Invalid value for -n flag: ${parts[1]}`);
+                    //alert(`Invalid value for -n flag: ${parts[1]}`);
                 }
             } else {
                 console.warn('-n flag used without a value');
@@ -356,6 +356,7 @@ function handleScriptOutput(data) {
     // Format the output for display
     const formattedOutput = formatOutputForDisplay(data.output);
     elements.output.textContent += formattedOutput + '\n';
+    //elements.output.textContent += data.output;
     elements.output.scrollTop = elements.output.scrollHeight;
 
     const parts = data.output.trim().split(":");

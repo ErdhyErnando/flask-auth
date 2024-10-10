@@ -11,7 +11,7 @@ import time
 import select
 import signal
 from werkzeug.utils import secure_filename
-from utils import split_args, remove_empty_array, get_scripts, admin_required
+from utils import split_args, remove_empty_array, get_scripts, admin_required, get_raspberry_pi_ip
 import csv
 from datetime import datetime, timedelta
 from sqlalchemy.exc import IntegrityError
@@ -252,7 +252,8 @@ def register_routes(app, db, bcrypt, socketio):
         str
             The rendered HTML for the index page.
         """
-        return render_template('index.html')
+        raspberry_pi_ip = get_raspberry_pi_ip()
+        return render_template('index.html', raspberry_pi_ip=raspberry_pi_ip)
 
     # Signup and login routes
     @app.route('/signup', methods=['GET', 'POST'])
@@ -523,3 +524,27 @@ def register_routes(app, db, bcrypt, socketio):
         file_structure = generate_file_structure(RASP_DIR)
 
         return render_template('gui3.html', file_structure=file_structure, labels_data=labels_data)
+
+    @app.route('/get_raspberry_pi_ip')
+    def get_ip():
+        """
+        Get the Raspberry Pi's IP address.
+
+        Returns
+        -------
+        flask.Response
+            A JSON response containing the Raspberry Pi's IP address.
+
+        Notes
+        -----
+        This function uses the `get_raspberry_pi_ip()` utility function to retrieve
+        the IP address and returns it as a JSON object.
+
+        The returned JSON has the following structure:
+        {
+            "ip": "xxx.xxx.xxx.xxx"
+        }
+        where "xxx.xxx.xxx.xxx" is the actual IP address.
+        """
+        ip = get_raspberry_pi_ip()
+        return jsonify({'ip': ip})

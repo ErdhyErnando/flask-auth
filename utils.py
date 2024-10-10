@@ -4,6 +4,8 @@ from functools import wraps
 from flask import abort
 from flask_login import current_user
 
+import socket
+
 # RASP_DIR = '/home/pi/flask-auth/orthosis-scripts'  # for raspberry pi
 RASP_DIR = '/home/pi/OrthosisProject/orthosis_interface' # take file from OrthosisProject
 # RASP_DIR = '/home/pi/OrthosisProject' # for testing pub dummy file 
@@ -106,3 +108,32 @@ def admin_required(f):
             abort(403)
         return f(*args, **kwargs)
     return decorated_function
+
+def get_raspberry_pi_ip():
+    """
+    Get the IP address of the Raspberry Pi.
+
+    This function attempts to determine the IP address of the Raspberry Pi
+    by creating a socket connection to an external server (8.8.8.8).
+    If successful, it returns the local IP address. If an exception occurs,
+    it returns the loopback address (127.0.0.1).
+
+    Returns
+    -------
+    str
+        The IP address of the Raspberry Pi as a string.
+
+    Notes
+    -----
+    This function uses a UDP socket to determine the IP address.
+    It does not actually send any data to the external server.
+    """
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("8.8.8.8", 80))
+        ip_address = s.getsockname()[0]
+    except Exception:
+        ip_address = "127.0.0.1"
+    finally:
+        s.close()
+    return ip_address

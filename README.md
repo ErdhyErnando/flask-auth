@@ -1,48 +1,108 @@
-# Orthosis Web App using Flask-SocketIO
+# 🦾Orthosis Web App using Flask-SocketIO
 
-This project is a specialized Flask Web Application designed to run on a Raspberry Pi, providing a user-friendly interface for controlling and monitoring an orthosis device. The application integrates secure user authentication, a command-line interface (CLI) via [Shellinabox](https://github.com/shellinabox/shellinabox), and real-time data visualization using [Flask-SocketIO](https://github.com/miguelgrinberg/Flask-SocketIO) and [Chart.js](https://github.com/chartjs/Chart.js).
+This project is a specialized Flask Web Application designed to run on a Raspberry Pi, providing a user-friendly interface for controlling and monitoring an orthosis device. The application integrates user authentication, data visualization, and script management capabilities.
+
+## Table of Contents
+
+- [Features](#features)
+- [Hardware Requirements](#hardware-requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Running the Application](#running-the-application)
+- [Usage](#usage)
+- [Acknowledgements](#acknowledgements)
+
+## Features
+
+- User authentication with admin and regular user roles
+- Real-time python script execution and monitoring using WebSockets (Flask-SocketIO)
+- File management system for Python scripts
+- Data logging capabilities
+- Interactive GUI for script selection and execution
+- Data visualization using Chart.js
+- Command-line interface (CLI) via Shellinabox
+
+
+## Hardware Requirements
+
+The current application is run on the following hardware:
+
+- **Raspberry Pi**: 2018 Raspberry Pi 4 Model b
+- **Operating System**: Ubuntu 22.04
+
+The Flask server is configured to start automatically on boot using bashrc, ensuring the application is always available when the Raspberry Pi is powered on.
 
 ## Project Structure
 
 - `app.py`: Main application file for initializing and configuring the Flask app.
-- `models.py`: Database models.
+- `models.py`: Database models for User.
 - `requirements.txt`: List of dependencies for the project.
 - `routes.py`: Flask routes and SocketIO event handlers.
 - `run.py`: Script to run the Flask application.
+- `utils.py`: Utility functions for argument parsing and admin access control.
 - `static/`: Static files (CSS, images, JavaScript).
-- `templates/`: HTML templates.
-- `utils.py`: Utility functions.
-- `virt/`: Virtual environment directory.
+- `templates/`: HTML templates for the web interface.
 
 ## Installation
 
 1. Clone the repository:
-    ```sh
-    git clone https://github.com/ErdhyErnando/flask-auth.git
-    cd flask-auth
-    ```
+
+   ```sh
+   git clone https://github.com/ErdhyErnando/flask-auth.git
+   cd flask-auth
+   ```
 
 2. Create a virtual environment and activate it:
-    ```sh
-    python3 -m venv <VIRTUAL_ENVIRONMENT_NAME>
-    source <VIRTUAL_ENVIRONMENT_NAME>/bin/activate  # On Windows use `virt\Scripts\activate`
-    ```
+
+   ```sh
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   ```
 
 3. Install the dependencies:
-    ```sh
-    pip install -r requirements.txt
-    ```
+   ```sh
+   pip install -r requirements.txt
+   ```
+
+## Configuration
+
+1. Update the `RASP_DIR` variable in `utils.py` and `routes.py` to point to your script directory.
+2. Modify the database URI in `app.py` if needed.
 
 ## Running the Application
 
 1. Initialize the database:
-    ```sh
-    flask db init
-    flask db migrate
-    flask db upgrade
-    ```
 
-2. Run the Flask application:
-    ```sh
-    python run.py
-    ```
+   ```sh
+   flask db init
+   flask db migrate
+   flask db upgrade
+   ```
+
+2. The application will start automatically on boot. To run it manually:
+
+   ```sh
+   python3 run.py # or just `python` depending on python version
+   ```
+
+3. Access the application in your web browser at `http://<raspberry-pi-ip>:5000` or `http://localhost:5000`.
+
+## Usage
+
+1. Log in with your credentials or sign up for a new account (requires admin approval).
+2. After logging in, navigate to the GUI page.
+3. From the GUI page, navigate the file structure to select a script.
+4. If using version 2 of the orthosis:
+   a. Click the "Sudo IP Link" button.
+   b. Wait for the light to go on and off before proceeding.
+5. Input the parameters needed.
+6. Click "Run" to open a confirmation modal, then confirm to execute scripts and view real-time output.
+7. Monitor data visualization in real-time.
+8. Log and download experiment data.
+
+## Acknowledgements
+
+- [Flask](https://flask.palletsprojects.com/)
+- [Flask-SocketIO](https://flask-socketio.readthedocs.io/)
+- [Chart.js](https://www.chartjs.org/)
+- [Shellinabox](https://github.com/shellinabox/shellinabox)

@@ -114,8 +114,6 @@ To make the application start automatically when the Raspberry Pi boots up, you 
 
 Now, every time the Raspberry Pi boots up, it will automatically start the Flask application.
 
-Note: This method will start the application in the current terminal session. For a more robust solution in a production environment, consider using a process manager like systemd or supervisor.
-
 ## Usage
 
 1. Log in with your credentials or sign up for a new account (requires admin approval).

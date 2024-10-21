@@ -9,6 +9,7 @@ This project is a specialized Flask Web Application designed to run on a Raspber
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Running the Application](#running-the-application)
+- [Automatic Startup Using .bashrc](#automatic-startup-using-bashrc)
 - [Usage](#usage)
 - [Acknowledgements](#acknowledgements)
 
@@ -86,6 +87,34 @@ The Flask server is configured to start automatically on boot using bashrc, ensu
    ```
 
 3. Access the application in your web browser at `http://<raspberry-pi-ip>:5000` or `http://localhost:5000`.
+
+## Automatic Startup Using .bashrc
+
+To make the application start automatically when the Raspberry Pi boots up, you can add the Python command to the `.bashrc` file:
+
+1. Open the `.bashrc` file in a text editor:
+
+   ```sh
+   nano ~/.bashrc
+   ```
+
+2. Add the following line at the end of the file, replacing `/path/to/your/app` with the actual path to your application:
+
+   ```sh
+   python /path/to/your/app/run.py
+   ```
+
+3. Save the file and exit the text editor (in nano, press Ctrl+X, then Y, then Enter).
+
+4. Reload the `.bashrc` file or restart the Raspberry Pi for the changes to take effect:
+
+   ```sh
+   source ~/.bashrc
+   ```
+
+Now, every time the Raspberry Pi boots up, it will automatically start the Flask application.
+
+Note: This method will start the application in the current terminal session. For a more robust solution in a production environment, consider using a process manager like systemd or supervisor.
 
 ## Usage
 

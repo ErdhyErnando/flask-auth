@@ -6,6 +6,7 @@ This project is a specialized Flask Web Application designed to run on a Raspber
 
 - [Features](#features)
 - [Hardware Requirements](#hardware-requirements)
+- [Project Structure](#project-structure)
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Running the Application](#running-the-application)
@@ -35,14 +36,37 @@ The Flask server is configured to start automatically on boot using bashrc, ensu
 
 ## Project Structure
 
-- `app.py`: Main application file for initializing and configuring the Flask app.
-- `models.py`: Database models for User.
-- `requirements.txt`: List of dependencies for the project.
-- `routes.py`: Flask routes and SocketIO event handlers.
-- `run.py`: Script to run the Flask application.
-- `utils.py`: Utility functions for argument parsing and admin access control.
-- `static/`: Static files (CSS, images, JavaScript).
-- `templates/`: HTML templates for the web interface.
+```
+├── README.md                 # Project documentation and setup instructions
+├── app.py                    # Main application file for Flask setup and configuration
+├── models.py                 # Database models (e.g., User)
+├── requirements.txt          # List of Python dependencies for the project
+├── routes.py                 # Flask routes and SocketIO event handlers
+├── run.py                    # Script to run the Flask application
+├── utils.py                  # Utility functions (e.g., argument parsing, admin access control)
+├── static                    # Static files directory
+│   ├── css                   # CSS stylesheets folder
+│   │   ├── gui.css           # Styles for the GUI interface
+│   │   ├── hero.css          # Styles for hero sections
+│   │   ├── navbar.css        # Styles for the navigation bar
+│   │   ├── styles.css        # General styles
+│   │   ├── upload.css        # Styles for file upload functionality
+│   │   ├── uploadfile.css    # Additional styles for file upload
+│   │   └── utils.css         # Utility styles
+│   └── js                    # JavaScript files folder
+│       └── gui3-refactor.js  # Contains the JavaScript logic for the GUI Interface 
+├── templates                 # HTML templates folder
+│   ├── 403.html              # Forbidden error page
+│   ├── 404.html              # Not found error page
+│   ├── 500.html              # Server error page
+│   ├── base.html             # Base template for other pages
+│   ├── gui3.html             # GUI interface 
+│   ├── index.html            # Home page 
+│   ├── login.html            # Login page 
+│   ├── navbar.html           # Navigation bar 
+│   ├── signup.html           # Sign up page
+│   └── uploadfile.html       # File upload page with the JavaScript logic embedded
+```
 
 ## Installation
 
@@ -113,6 +137,11 @@ To make the application start automatically when the Raspberry Pi boots up, you 
    ```
 
 Now, every time the Raspberry Pi boots up, it will automatically start the Flask application.
+
+In the current `~/.bashrc` file of the Raspberry pi we added:
+```sh
+python3 /home/pi/flask-auth/run.py #in line 118
+```
 
 ## Usage
 
